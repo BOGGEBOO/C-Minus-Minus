@@ -1,0 +1,31 @@
+Anton Norman (antno464) & Oliver Brandett (olibr699)
+
+Språkspecifikation C--
+---------------------------------
+* OOP
+* Statisk Typning
+* Relativt strikt syntax
+* {} används för block
+* Semikolon kan användas men måste inte
+* Import/Include/require funktionalitet
+* Främst ägnat till CLI applikationer
+	* Kanske GUI stöd (i mån om tid)
+* filändelse = .cmm
+
+
+Språk exempel
+---------------------------------
+int x = 10
+int y = 11;
+int func add(int num1, int num2) {
+	int sum = num1 + num2;
+	ret sum;
+}
+
+void func print(){
+	CLI.printing(add(x, y))
+}
+
+print()
+
+---------------------------------
