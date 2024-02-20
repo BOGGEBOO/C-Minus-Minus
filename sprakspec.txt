@@ -55,6 +55,4 @@ class TestClass{
 TestClass tc = TestClass(1, 2);
 
 tc.print_1();
-
-tc.print_1();;
 ---------------------------------
