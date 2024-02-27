@@ -56,3 +56,18 @@ TestClass tc = TestClass(1, 2);
 
 tc.print_1();
 ---------------------------------
+
+BNF
+
+<variable> ::= <type> <name> '=' <primitive> |
+				<type> <name> '=' <object> |
+				<type> <name> '=' <expr>
+				
+<func> ::= <ftype> <name> '(' <params> ')' 
+
+<class> ::= 'class' <name> 
+
+<statement> ::= <expr <op> <expr> |
+				<primitive> <op> <primitive>
+
+<op> ::= '=' | '!=' | '<' | ...
