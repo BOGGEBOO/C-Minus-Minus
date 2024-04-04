@@ -179,8 +179,53 @@ class Parser
   def match(*pattern, &block)
     @current_rule.send(:match,*pattern,&block)
   end
-
 end
+
+
+
+class CMM
+  def initialize()
+    @cmmParser = Parser.new("CMM") do
+      token(/\s+/)
+      token(/\d+/) { | x | x.to_i }
+      token(/./) { | x | x }
+      token(/\*{2}/) { "**" }
+
+      start :expr do
+        match(:expr, '+', :term) { |a, _, b| AritmheticExpression.new(a, '+', b) }
+        match(:expr, '-', :term) { |a, _, b| AritmheticExpression.new(a, '-', b) }
+        match(:term)
+      end
+
+      rule :term do
+        match(:term, '*', :expo) { |a, _, b| AritmheticExpression.new(a, '*', b) }
+        match(:term, '/', :expo) { |a, _, b| AritmheticExpression.new(a, '/', b) }
+        match(:expo)
+      end
+
+      rule :expo do
+        match(:expo, '**', :num) { |a, _, b| AritmheticExpression.new(a, '**', b) }
+        match(:num)
+      end
+
+      rule :num do
+        match(Integer) { | x | CmmInteger.new(x) }
+        match('(', :expr, ')') { |_, a, _| a }
+      end
+
+    end
+  end
+
+  def parse(str)
+    @cmmParser.parse(str)
+  end
+end
+
+c_minus_minus = CMM.new()
+cmmFile = File.read("tests.cmm")
+p c_minus_minus.parse(cmmFile)
+
+
 
 class DiceRoller
 
@@ -343,7 +388,6 @@ class ConstraintParser < Parser
            puts("LH")
            exp,conn=lh,rh_conn
            @connectors.delete(lh_conn.name)
-         end
     end
     exp.out=conn
     conn.add_constraint(exp)

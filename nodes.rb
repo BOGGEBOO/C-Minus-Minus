@@ -78,9 +78,9 @@ end
 
 # res = AritmheticExpression.new(sum, "/", c)
 
-a = CmmBoolean.new(true)
-b = CmmBoolean.new(false)
+# a = CmmBoolean.new(true)
+# b = CmmBoolean.new(false)
 
-res = BinaryExpression.new(a, "!=", b)
+# res = BinaryExpression.new(a, "!=", b)
 
-puts res.evaluate()
+# puts res.evaluate()
