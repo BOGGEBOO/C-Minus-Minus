@@ -189,7 +189,10 @@ class CMM
       token(/\s+/)
       token(/\d+/) { | x | x.to_i }
       token(/./) { | x | x }
-      token(/\*{2}/) { "**" }
+      token(/\w+/) { | m | m }
+      token(/;/)
+
+
 
       start :expr do
         match(:expr, '+', :term) { |a, _, b| AritmheticExpression.new(a, '+', b) }
@@ -198,13 +201,14 @@ class CMM
       end
 
       rule :term do
+        match(:expo)
         match(:term, '*', :expo) { |a, _, b| AritmheticExpression.new(a, '*', b) }
         match(:term, '/', :expo) { |a, _, b| AritmheticExpression.new(a, '/', b) }
-        match(:expo)
+
       end
 
       rule :expo do
-        match(:expo, '**', :num) { |a, _, b| AritmheticExpression.new(a, '**', b) }
+        match(:expo, '*', '*', :num) { |a, _, _, b| AritmheticExpression.new(a, '**', b) }
         match(:num)
       end
 
