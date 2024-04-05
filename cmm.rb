@@ -185,12 +185,17 @@ end
 
 class CMM
   def initialize()
+
+    @@storage = {}
+
     @cmmParser = Parser.new("CMM") do
       token(/\s+/)
       token(/\d+/) { | x | x.to_i }
       token(/./) { | x | x }
-      token(/\w+/) { | m | m }
+      token(/\w+/) { | x | x }
       token(/;/)
+      token(/true/) { true }
+      token(/false/) { false }
 
 
 
@@ -216,6 +221,12 @@ class CMM
         match(Integer) { | x | CmmInteger.new(x) }
         match('(', :expr, ')') { |_, a, _| a }
       end
+
+      # TODO Lägg det här kodblocket där det ska vara
+      # rule :bool do
+      #   match("true") { | x | CmmBoolean.new(x) }
+      #   match("false") { | x | CmmBoolean.new(x) }
+      # end
 
     end
   end
