@@ -197,6 +197,9 @@ class CMM
       token(/true/) { true }
       token(/false/) { false }
 
+      # rule :var_declaration do
+      #   match(:type, :name, '=', :val) { "do the thing" }
+      # end
 
 
       start :expr do
