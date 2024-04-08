@@ -1,4 +1,9 @@
-class AritmheticExpression
+class Node
+    def evaluate()
+    end
+end
+
+class AritmheticExpression < Node
     attr_reader :lhs, :op, :rhs
     def initialize(lhs, op, rhs)
         @lhs = lhs
@@ -11,7 +16,7 @@ class AritmheticExpression
     end
 end
 
-class CmmFloat
+class CmmFloat < Node
 
     attr_accessor :value
 
@@ -27,7 +32,7 @@ class CmmFloat
     #end
 end
 
-class CmmInteger
+class CmmInteger < Node
 
     attr_accessor :value
 
@@ -41,7 +46,7 @@ class CmmInteger
 
 end
 
-class BinaryExpression
+class BinaryExpression < Node
     attr_reader :lhs, :op, :rhs
 
     def initialize(lhs, op, rhs)
@@ -56,7 +61,7 @@ class BinaryExpression
 
 end
 
-class CmmBoolean
+class CmmBoolean < Node
     attr_accessor :value
 
     def initialize(val)
@@ -69,18 +74,42 @@ class CmmBoolean
 
 end
 
+class CmmFunction < Node
+    attr_accessor :type, :name, :params, :codeBlock
 
-# a = CmmInteger.new(7)
-# b = CmmInteger.new(3)
-# c = CmmFloat.new(5.5)
+    def initialize(type, name, params, codeBlock)
+        @type = type
+        @name = name
+        @codeBlock = codeBlock
+    end
 
-# sum = AritmheticExpression.new(a, "+", b)
+    def evaluate()
+        self.codeBlock.evaluate()
+    end
+end
 
-# res = AritmheticExpression.new(sum, "/", c)
+class CodeBlock < Node
+    attr_accessor :params
+    def initialize(params)
+        @params = params
+    end
 
-# a = CmmBoolean.new(true)
-# b = CmmBoolean.new(false)
+    def evaluate()
 
-# res = BinaryExpression.new(a, "!=", b)
+    end
+end
 
-# puts res.evaluate()
+
+class Print < Node
+    attr_accessor :val
+
+    def initialize(val)
+        @val = val
+        evaluate
+    end
+
+    def evaluate()
+        puts "********************************"
+        puts val
+    end
+end

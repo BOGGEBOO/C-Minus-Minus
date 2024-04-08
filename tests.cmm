@@ -1,1 +1,8 @@
-5**2
+void main(){
+    float var1 = 4.6;
+    int var2 = 10;
+    bool var3 = True;
+    bool var4 = False;
+    int sum = var2 + 2;
+    PRINT(sum);
+}

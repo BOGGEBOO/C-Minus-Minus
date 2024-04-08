@@ -4,21 +4,21 @@ require 'Converter'
 require 'debug_stack'
 
 class Language
-       
+
   def initialize
     @diceParser = Parser.new("dice roller") do
       token(/\s+/)
       token(/\w+/){|m| m}
-	  token(/\d+\.\d+/){|m|m}
+	    token(/\d+\.\d+/){|m|m}
       token(/\d+/) {|m| m }
       token(/((\+\+)|(--)|(==)|(\+=)|(-=)|(\*=)|(\/=)|(>=)|(<=)|(!=)|(&&)|(\|\|))/){|m| m}
       token(/".*?"/) {|m| m}
       token(/./) {|m| m}
-      
+
      Language.init()
-     
+
       start :program do
-        match(:program_parts) do |program| 
+        match(:program_parts) do |program|
           file = File.open('program.rb', 'a')
           file.write(program)
           file.close
@@ -44,7 +44,7 @@ class Language
         match(:statement){|m|m}
       end
 
-      rule :statement do 
+      rule :statement do
         match('break', ';'){ DataCon.new("break;")}
         match(:variable_declaration, ';'){|var_dec, _| DataCon.new(var_dec,";")}
         match(:assignment, ';'){|assignment, _| DataCon.new(assignment,";")}
@@ -54,29 +54,29 @@ class Language
         match(:while){|m|m}
         match(:call, ';'){|m, _| DataCon.new(m,";")}
       end
-      
+
       rule :variable_declaration do
         match(:declaration_assignment) {|m|m}
-        match(:type, :identifier, '[', :int_literal, ']') do 
-          |type, identifier, _, int_literal, _| 
+        match(:type, :identifier, '[', :int_literal, ']') do
+          |type, identifier, _, int_literal, _|
           Converter.declaration(type, identifier, int_literal)
 	end
         match(:type, :identifier)  {|type, identifier| Converter.declaration(type, identifier)}
       end
 
       rule :declaration_assignment do
-        match(:type, :identifier, :assignment_opr, :expression) do 
-          |type, identifier, assignment_opr, expression| 
-          Converter.declaration_assignment(type, identifier, assignment_opr, "", expression) 
+        match(:type, :identifier, :assignment_opr, :expression) do
+          |type, identifier, assignment_opr, expression|
+          Converter.declaration_assignment(type, identifier, assignment_opr, "", expression)
 	end
 
-        match(:type, :identifier, '[', :expression, ']',  '=', :array_assignment) do 
-          |type, identifier, _, int_literal, _, _, array_assignment| 
+        match(:type, :identifier, '[', :expression, ']',  '=', :array_assignment) do
+          |type, identifier, _, int_literal, _, _, array_assignment|
           Converter.declaration_assignment(type, identifier, DataCon.new('"="'), int_literal, array_assignment)
 	end
 
-        match(:type, :identifier, '[', :expression, ']', :assignment_opr, :expression) do 
-          |type, identifier, _, int_literal, _, assignment_opr, expression| 
+        match(:type, :identifier, '[', :expression, ']', :assignment_opr, :expression) do
+          |type, identifier, _, int_literal, _, assignment_opr, expression|
           Converter.declaration_assignment(type, identifier, assignment_opr, int_literal, expression)
 	end
       end
@@ -101,12 +101,12 @@ class Language
 
       rule :while do
         match('while', '(', :expression, ')', '>', '<' ) {|_,_,expr,_,_| Converter.make_while()}
-        match('while', '(', :expression, ')', '>', :statement_list, '<' ) do 
-          |_,_,expr,_,_,stmt,_| 
+        match('while', '(', :expression, ')', '>', :statement_list, '<' ) do
+          |_,_,expr,_,_,stmt,_|
           Converter.make_while(expr, stmt)
         end
       end
-      
+
       rule :not_test do
         match('!', :not_test) {|_, not_test| Converter.binary_not(not_test)}
         match(:comparision){|m|m }
@@ -173,13 +173,13 @@ class Language
       end
 
       rule :function_declaration do
-        match(:type, :identifier, '(', :func_arg_list, ')', '>', :statement_list, 'return', :return , ';', '<' ) do 
-          |type, ident, _, arg_list, _, _, stmt_list, _, ret, _, _| 
+        match(:type, :identifier, '(', :func_arg_list, ')', '>', :statement_list, 'return', :return , ';', '<' ) do
+          |type, ident, _, arg_list, _, _, stmt_list, _, ret, _, _|
           Converter.function_declaration(type, ident, Converter.init_func(stmt_list, arg_list), ret, arg_list)
         end
 
-        match(:type, :identifier, '(', ')', '>', :statement_list, 'return', :return , ';', '<' ) do 
-          |type, ident, _, _, _, stmt_list, _, ret, _, _| 
+        match(:type, :identifier, '(', ')', '>', :statement_list, 'return', :return , ';', '<' ) do
+          |type, ident, _, _, _, stmt_list, _, ret, _, _|
           Converter.function_declaration(type, ident, Converter.init_func(stmt_list), ret)
         end
 
@@ -193,10 +193,10 @@ class Language
 			Converter.function_declaration(type, ident, Converter.init_func(DataCon.new(""), ret)
 
       end
-      
+
       rule :call do
-        match(:identifier, '(', ')') do 
-		|primary, _| 
+        match(:identifier, '(', ')') do
+		|primary, _|
 		Converter.call_func(primary)
 		end
 
@@ -214,7 +214,7 @@ class Language
         match(:expression, ',', :argument_list){|expr, _, arg_list| Converter.argument_list(expr, arg_list)}
         match(:expression){|m|m }
       end
-     
+
       rule :int_literal do
         match(:decimal_digits){|m|m }
       end
@@ -222,34 +222,34 @@ class Language
       rule :decimal_digits do
         match(/[0-9]+/){|m| DataCon.new(m)}
       end
-      
+
       rule :for_stmt do
-        match('for', '(', :statement, ';', :expression, ';', :assignment, ')', '>', :statement_list, '<') do 
-          |_, _, stmt, _,expr, _, assignment, _, _, stmt_list,_ | 
-          Converter.for_stmt(stmt, expr, assignment, stmt_list) 
+        match('for', '(', :statement, ';', :expression, ';', :assignment, ')', '>', :statement_list, '<') do
+          |_, _, stmt, _,expr, _, assignment, _, _, stmt_list,_ |
+          Converter.for_stmt(stmt, expr, assignment, stmt_list)
         end
 
-        match('for' ,'(', :statement, ';', :expression, ';', :assignment, ')', '>','<') do 
-          |_, _, stmt, _, expr, _, assignment, _, _, _| 
-          Converter.for_stmt(stmt, expr, assignment) 
+        match('for' ,'(', :statement, ';', :expression, ';', :assignment, ')', '>','<') do
+          |_, _, stmt, _, expr, _, assignment, _, _, _|
+          Converter.for_stmt(stmt, expr, assignment)
         end
       end
 
       rule :options do
-        match('options', '(', :literal_expr, ')', '>', :cases) do 
-          |_, _, literal_expr, _, _, cases| 
+        match('options', '(', :literal_expr, ')', '>', :cases) do
+          |_, _, literal_expr, _, _, cases|
           Converter.options(literal_expr, cases)
         end
       end
 
       rule :cases do
-        match('case', :literal_expr, ':', :statement_list, :cases) do 
-          |_, literal_expr, _, stmt_list, cases| 
+        match('case', :literal_expr, ':', :statement_list, :cases) do
+          |_, literal_expr, _, stmt_list, cases|
           Converterases(literal_expr, stmt_list, cases)
         end
 
-        match('default', ':', :statement_list, :cases) do 
-          |_, _, stmt_list, cases| 
+        match('default', ':', :statement_list, :cases) do
+          |_, _, stmt_list, cases|
           Converterases("", stmt_list, cases, true)
         end
 
@@ -257,32 +257,32 @@ class Language
       end
 
       rule :if_stmt do
-        match('if', '(', :expression, ')', '>', :statement_list, '<', 'else', '>', :statement_list, '<') do 
-          |_, _, expr, _, _, stmt_list_if, _, _, _, stmt_list_else, _ |  
+        match('if', '(', :expression, ')', '>', :statement_list, '<', 'else', '>', :statement_list, '<') do
+          |_, _, expr, _, _, stmt_list_if, _, _, _, stmt_list_else, _ |
           Converter.make_if(expr, stmt_list_if, stmt_list_else)
         end
 
         match('if', '(', :expression, ')', '>', :statement_list, '<', 'else', '>','<') do
-          |_, _, expr, _, _, stmt_list_if, _, _, _,_ | 
+          |_, _, expr, _, _, stmt_list_if, _, _, _,_ |
           Converter.make_if(expr, stmt_list_if)
         end
-        
+
         match('if', '(', :expression, ')', '>','<', 'else', '>', :statement_list, '<') do
           |_, _, expr, _, _, _, _, _, stmt_list_else, _ |
           Converter.make_if(expr,  "", stmt_list_else)
         end
 
-        match('if', '(', :expression, ')', '>','<', 'else', '>','<') do 
+        match('if', '(', :expression, ')', '>','<', 'else', '>','<') do
           |_, _, expr, _, _, _, _, _, _|
           Converter.make_if(expr)
         end
 
-        match('if', '(', :expression, ')', '>','<' ) do 
+        match('if', '(', :expression, ')', '>','<' ) do
           |_, _, expr, _, _, _|
           Converter.make_if(expr, "", "", false)
         end
 
-        match('if', '(', :expression, ')', '>', :statement_list, '<' ) do 
+        match('if', '(', :expression, ')', '>', :statement_list, '<' ) do
           |_, _, expr, _, _, stmt_list_if, _|
           Converter.make_if(expr, stmt_list_if, "", false)
         end
@@ -303,8 +303,8 @@ class Language
       end
 
       rule :float_literal do
-        match(:decimal_digits, '.', :decimal_digits) do 
-          |dec_digits_1, _, dec_digits_2| 
+        match(:decimal_digits, '.', :decimal_digits) do
+          |dec_digits_1, _, dec_digits_2|
           Converter.float_literal(dec_digits_1, dec_digits_2)
         end
       end
@@ -320,14 +320,14 @@ class Language
       end
 
       rule :array_identifier do
-      match(/[A-z0-9]+/, '[', /\d+/, ']') do 
-        |ident, _, literal, _| 
+      match(/[A-z0-9]+/, '[', /\d+/, ']') do
+        |ident, _, literal, _|
         DataCon.new("_get_variable(:#{ident}, variables)[#{literal}]")
         end
       end
-	
+
       rule :variable_identifier do
-        match(/-?[A-z0-9]+/) do |ident| 
+        match(/-?[A-z0-9]+/) do |ident|
 		k = DataCon.new("_get_variable(:", ident, ",variables)")
 		k.sec("v:",ident)
 		k
@@ -350,7 +350,7 @@ i
 
       rule :assignment do
         match(:identifier, :assignment_opr, :expression) do
-          |ident, opr, expr| 
+          |ident, opr, expr|
           Converter.assignment(ident, opr, expr)
         end
 
@@ -358,8 +358,8 @@ i
           |ident, opr|
           Converter.assignment(ident, opr)
         end
-      
-        match(:identifier, '[', :int_literal, ']', :assignment_opr, :expression) do 
+
+        match(:identifier, '[', :int_literal, ']', :assignment_opr, :expression) do
           |ident, _, int_literal, _, opr, expr|
           Converter.array_assignment(ident, int_literal, opr, expr)
         end
@@ -417,11 +417,11 @@ end
 ')
 file.close()
     end
-  
+
   def done(str)
     ["quit","exit","bye",""].include?(str.chomp)
   end
-  
+
   def roll
     print "[diceroller] "
     str = gets
@@ -442,7 +442,7 @@ file.close()
 		return "Syntax error"
 	end
 	return nil
-  end 
+  end
 
   def log(state = false)
     if state
@@ -452,4 +452,3 @@ file.close()
     end
   end
 end
-
