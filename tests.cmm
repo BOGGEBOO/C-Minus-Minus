@@ -1,8 +1,10 @@
 void main(){
     float var1 = 4.6;
-    int var2 = 10;
+    int var2 = 10 + 5;
+    PRINT(var2);
     bool var3 = True;
     bool var4 = False;
-    int sum = var2 + 2;
-    PRINT(sum);
+    PRINT(10 - 1.5);
+    PRINT(var1 + 10);
+    int test = 42;
 }
