@@ -39,7 +39,7 @@ class CMM
                 puts "\n\n\n"
                 puts @@executive_dumpster
 
-                x.evaluate 
+                x.evaluate
                 puts @@var_dupster
             }
             end
@@ -52,9 +52,9 @@ class CMM
                 # match(:type, :identifier, '(', :params ')', '{', :code_block, '}') {}
             end
 
-            rule :main do
-                match(:type, 'main', '(', ')', '{', '}') { 0 }
-                match(:type, 'main', '(', ')', '{', :code_blocks, '}') # { |_, _, _, _, _, x, _| x }
+            rule :main do #Bättre än 'codeGo' behövs
+                match(:type, 'codeGo', '(', ')', '{', '}') { 0 }
+                match(:type, 'codeGo', '(', ')', '{', :code_blocks, '}') # { |_, _, _, _, _, x, _| x }
             end
 
             rule :code_blocks do
@@ -65,12 +65,35 @@ class CMM
             rule :code_block do
                 match(:assign)
                 match(:print)
+                match(:if_statement)
             end
 
             rule :assign do
                 match(:type, :identifier, '=', :value, ';') do |type, identifier, _, value, _|
                     @@executive_dumpster << Assignment.new(identifier, value, type)
                 end
+            end
+
+            rule :if_statement do
+                match('if', '(', :if_expr, ')', '{', :code_blocks, '}') do |_,_,a,_,_,b,_|
+                    @@executive_dumpster << ifStatement.new(a, b, @@var_dupster)
+                end
+            end
+
+
+            rule :if_expr do
+                match(:value, :operator, :value) {|a,b,c| BinaryExpression.new(a,b,c)}
+                #match(:value)
+                #match('!', :value)
+            end
+
+            rule :operator do
+                match("=","=") { |a, b| "#{a}#{b}" }
+                match("!","=") { |a, b| "#{a}#{b}" }
+                match("<","=") { |a, b| "#{a}#{b}" }
+                match(">","=") { |a, b| "#{a}#{b}" }
+                match("<") { |x| x }
+                match(">") { |x| x }
             end
 
             rule :print do

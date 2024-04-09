@@ -189,3 +189,14 @@ class LookUp < CodeBlock
         end
     end
 end
+
+
+# !!! FIXA DEN HÄR SKITEN !!!
+#scopehanteringsbullshitfanhelvetesjävlaskit
+
+class ifStatement < Node
+    def initialize(a,b,dupster)
+        @expr = a
+        @local_bumpster = b
+    end
+end

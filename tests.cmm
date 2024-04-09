@@ -1,4 +1,4 @@
-void main(){
+void codeGo(){
     float var1 = 4.6;
     int var2 = 10 + 5;
     PRINT(var2);
@@ -7,4 +7,7 @@ void main(){
     PRINT(10 - 1.5);
     PRINT(var1 + 10);
     int test = 42;
+    if (15 == var2){
+        PRINT(var1 - var2);
+    }
 }
