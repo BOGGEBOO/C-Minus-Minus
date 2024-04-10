@@ -7,7 +7,7 @@ class Rule
     Match = Struct.new :pattern, :block
 
     def initialize(name, parser)
-        @logger = Logger.new(STDOUT)
+        @logger = parser.logger
         @name = name
         @parser = parser
         @matches = []
@@ -85,7 +85,7 @@ end
 class Parser
 
     attr_accessor :pos
-    attr_reader :rules, :string
+    attr_reader :rules, :string, :logger
 
     class ParseError < RuntimeError; end
 

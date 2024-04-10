@@ -14,15 +14,6 @@ class AritmheticExpression < Node
     end
 
     def evaluate()
-
-        # FUL LÖSNING
-
-        # if @lhs.is_a?(LookUp)
-        #     @lhs = @lhs.evaluate
-        # end
-        # if @rhs.is_a?(LookUp)
-        #     @rhs = @rhs.evaluate
-        # end
         return eval("#{@lhs.evaluate}#{@op}#{@rhs.evaluate}")
     end
 end
@@ -100,12 +91,27 @@ class CmmFunction < Node
 end
 
 class CodeBlock < Node
+    attr_accessor :blocks, :block
+
+    def initialize(blocks, block)
+        @blocks = blocks
+        @block = block
+        @result = []
+    end
+
     def evaluate()
+        @result << @blocks.evaluate
+        @result << @block.evaluate
+
+        # @blocks.each do |x|
+        #     @result << x.evaluate
+        # end
+        return @result
     end
 end
 
 
-class Print < CodeBlock
+class Print < Node
     attr_accessor :val
 
     def initialize(val)
@@ -118,26 +124,20 @@ class Print < CodeBlock
         while @val.is_a?(Node)
             @val = @val.evaluate()
         end
-        puts "\n\n********************************"
+        # puts "\n\n********************************"
         puts @val
-        puts "********************************"
+        # puts "********************************"
     end
 end
 
 
-class Assignment < CodeBlock
+class Assignment < Node
     attr_accessor :identifier, :value, :type
 
     def initialize(identifier, val, type)
         @identifier = identifier
         @value = val
         @type = type
-
-        # puts "\n\n********************************"
-        # puts @type
-        # puts @identifier
-        # puts @value
-        # puts "********************************\n\n"
     end
 
     def evaluate()
@@ -167,14 +167,12 @@ class MainFunction < Node
     end
 
     def evaluate()
-        @statements.each do |x|
-            x.evaluate()
-        end
+        @statements.evaluate()
     end
 end
 
 
-class LookUp < CodeBlock
+class LookUp < Node
 
     attr_accessor :identifier
 
@@ -194,9 +192,17 @@ end
 # !!! FIXA DEN HÄR SKITEN !!!
 #scopehanteringsbullshitfanhelvetesjävlaskit
 
-class ifStatement < Node
+class IfStatement < Node
+    attr_accessor :expr, :local_bumpster, :dupster
     def initialize(a,b,dupster)
         @expr = a
         @local_bumpster = b
+        @dupster = dupster
+    end
+
+    def evaluate()
+        if @expr.evaluate()
+            @local_bumpster.evaluate()
+        end
     end
 end

@@ -8,6 +8,9 @@ class CMM
     @@var_dupster = {}
     @@func_dumpster = {}
     @@executive_dumpster = []
+    @@current_scope = []
+    @@new_scope = []
+    @@using_global = true
 
     def self.setVar(identifier, value)
         @@var_dupster[identifier] = value
@@ -36,11 +39,14 @@ class CMM
             # end
             start :program do
                 match(:func_declare) { |x|
-                puts "\n\n\n"
-                puts @@executive_dumpster
+                # @@new_scope.each_with_index do |x, n|
+                #     print "\n#{n+1}. "; p x
+                # end
+                # puts "\n\n\n"
+                x.evaluate unless x.class == nil
 
-                x.evaluate
-                puts @@var_dupster
+                #p @@new_scope
+
             }
             end
 
@@ -48,17 +54,17 @@ class CMM
             # gå i genom i :program med .evaluate
 
             rule :func_declare do
-                match(:main) { |x| MainFunction.new(@@executive_dumpster) }
+                match(:main) { |x| MainFunction.new(x) unless x.class == nil }
                 # match(:type, :identifier, '(', :params ')', '{', :code_block, '}') {}
             end
 
-            rule :main do #Bättre än 'codeGo' behövs
-                match(:type, 'codeGo', '(', ')', '{', '}') { 0 }
-                match(:type, 'codeGo', '(', ')', '{', :code_blocks, '}') # { |_, _, _, _, _, x, _| x }
+            rule :main do
+                match(:type, /codeGoBr[r]+/, '(', ')', '{', '}') { 0 }
+                match(:type, /codeGoBr[r]+/, '(', ')', '{', :code_blocks, '}') { |_, _, _, _, _, x, _| x }
             end
 
             rule :code_blocks do
-                match(:code_blocks, :code_block) # {CodeBlock.new()}
+                match(:code_blocks, :code_block) { |x, c| CodeBlock.new(x, c)}
                 match(:code_block)
             end
 
@@ -70,21 +76,22 @@ class CMM
 
             rule :assign do
                 match(:type, :identifier, '=', :value, ';') do |type, identifier, _, value, _|
-                    @@executive_dumpster << Assignment.new(identifier, value, type)
+                    Assignment.new(identifier, value, type)
                 end
             end
 
             rule :if_statement do
                 match('if', '(', :if_expr, ')', '{', :code_blocks, '}') do |_,_,a,_,_,b,_|
-                    @@executive_dumpster << ifStatement.new(a, b, @@var_dupster)
+                    IfStatement.new(a, b, @@var_dupster)
                 end
             end
 
-
             rule :if_expr do
-                match(:value, :operator, :value) {|a,b,c| BinaryExpression.new(a,b,c)}
-                #match(:value)
-                #match('!', :value)
+                match(:value, :operator, :value) do |val1, op, val2|
+                    @@executive_dumpster.concat(@@current_scope)
+                    @@current_scope = []
+                    BinaryExpression.new(val1, op, val2)
+                end
             end
 
             rule :operator do
@@ -94,11 +101,13 @@ class CMM
                 match(">","=") { |a, b| "#{a}#{b}" }
                 match("<") { |x| x }
                 match(">") { |x| x }
+                match("&","&") { |a, b| "and" }
+                match("|","|") { |a, b| "or" }
             end
 
             rule :print do
                 match('PRINT', '(', :value, ')', ';') do |_, _, x, _, _|
-                    @@executive_dumpster << Print.new(x)
+                Print.new(x)
                 end
             end
 
@@ -154,9 +163,6 @@ class CMM
                 match(Integer) { |x| CmmInteger.new(x) }
                 match(Float) { |x| CmmFloat.new(x) }
                 match(:identifier) do |a|
-                    # puts "\n\n\n"
-                    # puts @@var_dupster[a]
-                    # puts "\n\n\n"
                     LookUp.new(a)
                 end
                 match('(', :expr, ')') { |_, a, _| a }
@@ -168,8 +174,17 @@ class CMM
     def parse(str)
         @cmmParser.parse(str)
     end
+
+    def log(state = false)
+        if state
+            @cmmParser.logger.level = Logger::DEBUG
+        else
+            @cmmParser.logger.level = Logger::WARN
+        end
+    end
 end
 
 c_minus_minus = CMM.new()
+c_minus_minus.log(false)
 cmmFile = File.read("tests.cmm")
-p c_minus_minus.parse(cmmFile)
+c_minus_minus.parse(cmmFile)
