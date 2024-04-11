@@ -4,7 +4,7 @@ void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     int test = 42;
     if (15 == var2){
         PRINT(111);
-        if (10 > test){
+        if (10 < test){
             PRINT(222);
         }
     }

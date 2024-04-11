@@ -126,6 +126,7 @@ class Print < Node
         end
         # puts "\n\n********************************"
         puts @val
+        return @val
         # puts "********************************"
     end
 end
@@ -167,7 +168,9 @@ class MainFunction < Node
     end
 
     def evaluate()
-        @statements.evaluate()
+        @statements.each do |x|
+            x.evaluate()
+        end
     end
 end
 
@@ -202,7 +205,9 @@ class IfStatement < Node
 
     def evaluate()
         if @expr.evaluate()
-            @local_bumpster.evaluate()
+            @local_bumpster.each() do |x|
+                x.evaluate()
+            end
         end
     end
 end

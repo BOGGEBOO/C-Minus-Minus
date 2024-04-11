@@ -6,11 +6,6 @@ require './nodes'
 class CMM
 
     @@var_dupster = {}
-    @@func_dumpster = {}
-    @@executive_dumpster = []
-    @@current_scope = []
-    @@new_scope = []
-    @@using_global = true
 
     def self.setVar(identifier, value)
         @@var_dupster[identifier] = value
@@ -34,27 +29,19 @@ class CMM
             # Längst ner yo
             token(/./) { |x| x }
 
-            # rule :var_declaration do
-            #   match(:type, :name, '=', :val, ';') { |a, b, _, c, _ | "do the thing" }
-            # end
+
             start :program do
-                match(:func_declare) { |x|
-                # @@new_scope.each_with_index do |x, n|
-                #     print "\n#{n+1}. "; p x
-                # end
-                # puts "\n\n\n"
-                x.evaluate unless x.class == nil
-
-                #p @@new_scope
-
-            }
+                match(:func_declare) do |x|
+                    x.statements.each_with_index do |val, index|
+                        print "\n#{index + 1}. "; p val
+                    end
+                    puts "\n\n\n"
+                    x.evaluate
+                end
             end
 
-            # spara code_block noder(print,assign) i container,
-            # gå i genom i :program med .evaluate
-
             rule :func_declare do
-                match(:main) { |x| MainFunction.new(x) unless x.class == nil }
+                match(:main) { |x| MainFunction.new(x) }
                 # match(:type, :identifier, '(', :params ')', '{', :code_block, '}') {}
             end
 
@@ -64,8 +51,11 @@ class CMM
             end
 
             rule :code_blocks do
-                match(:code_blocks, :code_block) { |x, c| CodeBlock.new(x, c)}
-                match(:code_block)
+                match(:code_blocks, :code_block) do |x, c|
+                    x << c
+                    x
+                end
+                match(:code_block) { |x| [x] }
             end
 
             rule :code_block do
@@ -88,8 +78,6 @@ class CMM
 
             rule :if_expr do
                 match(:value, :operator, :value) do |val1, op, val2|
-                    @@executive_dumpster.concat(@@current_scope)
-                    @@current_scope = []
                     BinaryExpression.new(val1, op, val2)
                 end
             end
@@ -139,7 +127,7 @@ class CMM
             end
 
             rule :identifier do
-                match(/[a-z]+[\w]+/)  # {spara undan namn}
+                match(/[a-z]+[\w]+/)
             end
 
             rule :expr do
