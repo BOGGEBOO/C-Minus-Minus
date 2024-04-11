@@ -1,12 +1,9 @@
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     float var1 = 4.6;
     int var2 = 10 + 5;
-    int test = 42;
-    if (15 == var2){
-        PRINT(111);
-        if (10 < test){
-            PRINT(222);
-        }
+    int c = 10;
+    while(c >= 0){
+        PRINT(c);
+        c--;
     }
-    PRINT(test);
 }

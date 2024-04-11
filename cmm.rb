@@ -52,7 +52,12 @@ class CMM
 
             rule :code_blocks do
                 match(:code_blocks, :code_block) do |x, c|
-                    x << c
+
+                    if c.class == Array
+                        x.concat(c)
+                    else
+                        x << c
+                    end
                     x
                 end
                 match(:code_block) { |x| [x] }
@@ -62,6 +67,10 @@ class CMM
                 match(:assign)
                 match(:print)
                 match(:if_statement)
+                match(:change_var)
+                match(:while_loop)
+                match(:increment)
+                match(:decrement)
             end
 
             rule :assign do
@@ -70,15 +79,75 @@ class CMM
                 end
             end
 
+            rule :change_var do
+                match(:identifier, '=', :value, ';') do |identifier, _, new_value, _|
+                    ChangeVariable.new(identifier, new_value)
+                end
+            end
+
             rule :if_statement do
+                match('if', '(', :if_expr, ')', '{', :code_blocks, '}', :else_statement) do |_,_,a,_,_,b,_,c|
+                    ElifStatment.new(a,b,c)
+                end
+                match('if', '(', :if_expr, ')', '{', :code_blocks, '}', :elif_statements) do |_,_,a,_,_,b,_,c|
+                    ElifStatment.new(a,b,c)
+                end
                 match('if', '(', :if_expr, ')', '{', :code_blocks, '}') do |_,_,a,_,_,b,_|
                     IfStatement.new(a, b, @@var_dupster)
                 end
+
             end
 
             rule :if_expr do
                 match(:value, :operator, :value) do |val1, op, val2|
                     BinaryExpression.new(val1, op, val2)
+                end
+            end
+
+            rule :else_statement do
+                match('else', '{', :code_blocks, '}') do |_,_,a,_|
+                    ElseStatment.new(a)
+                end
+            end
+
+            rule :elif_statements do
+                match(:elif_statements, :elif_statement) do |a,b|
+                    a.next_elif = b
+                end
+                match(:elif_statement) do |a|
+                    a
+                end
+
+            end
+
+            rule :elif_statement do
+                match('elif', '(', :if_expr, ')', '{', :code_blocks, '}', :elif_statement) do |_,_,a,_,_,b,_,c|
+                    ElifStatment.new(a,b,c)
+                end
+                match('elif', '(', :if_expr, ')', '{', :code_blocks, '}', :else_statement) do |_,_,a,_,_,b,_,c|
+                    ElifStatment.new(a,b,c)
+                end
+                match('elif', '(', :if_expr, ')', '{', :code_blocks, '}') do |_,_,a,_,_,b,_|
+                    ElifStatment.new(a,b)
+                end
+
+            end
+
+            rule :while_loop do
+                match('while', '(', :if_expr, ')', '{', :code_blocks, '}') do |_,_,a,_,_,b,_|
+                    WhileLoop.new(a,b)
+                end
+            end
+
+            rule :increment do
+                match(:value, '+', '+', ';') do |a,_,_,_|
+                    Increment.new(a)
+                end
+            end
+
+            rule :decrement do
+                match(:value, '-', '-', ';') do |a,_,_,_|
+                    Decrement.new(a)
                 end
             end
 
@@ -127,7 +196,7 @@ class CMM
             end
 
             rule :identifier do
-                match(/[a-z]+[\w]+/)
+                match(/[a-z]+[\w]*/)
             end
 
             rule :expr do
