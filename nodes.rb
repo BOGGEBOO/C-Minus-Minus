@@ -3,8 +3,10 @@
 $scope = [{}]
 $scope_depth = 0
 
+$funcs = {}
+
 ####################################
-#            NODE                  #
+#     NODE (BASECLASS)             #
 ####################################
 class Node
     def evaluate()
@@ -131,16 +133,76 @@ end
 #   CMM FUNCTION                   #
 ####################################
 class CmmFunction < Node
-    attr_accessor :type, :name, :params, :codeBlock
+    attr_accessor :type, :params, :codeBlock
 
-    def initialize(type, name, params, codeBlock)
+    def initialize(type, params, codeBlock)
         @type = type
-        @name = name
+        @params = params
         @codeBlock = codeBlock
     end
 
+    def evaluate(values)
+        $scope << {}
+        $scope_depth +=1
+        replacePossible = false
+
+        #p values[0].evaluate
+        values.each_with_index do |value,index|
+            if @params[index][@params[0].keys()[index]] == "int" && values[index].class == CmmInteger
+                replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "int" && values[index].evaluate.class == CmmInteger
+                replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "float" && values[index].class == CmmFloat
+                replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "float" && values[index].evaluate.class == CmmFloat
+                replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "bool" && values[index].class == CmmBoolean
+                replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "bool" && values[index].evaluate.class == CmmBoolean
+                replacePossible = true
+            end
+            if replacePossible
+                $scope[$scope_depth][@params[index].keys()[0]] = value
+            end
+        end
+
+        @codeBlock.each do |x|
+            x.evaluate()
+        end
+        $scope_depth -=1
+        $scope.pop()
+    end
+end
+
+####################################
+#   CMM FUNCTION CALL              #
+####################################
+class FunctionCall < Node
+    attr_accessor :name, :params
+
+    def initialize(name, params)
+        @name = name
+        @params = params
+    end
+
     def evaluate()
-        self.codeBlock.evaluate()
+        $funcs[@name].evaluate(@params)
+    end
+end
+
+####################################
+#   CMM FUNCTION DECLARATION       #
+####################################
+class FunctionDeclaration < Node
+    attr_accessor :identifier, :function
+
+    def initialize(identifier, func)
+        @identifier = identifier
+        @function = func
+    end
+
+    def evaluate()
+        $funcs[@identifier] = @function
     end
 end
 
@@ -295,11 +357,10 @@ end
 #   IF STATEMENT                   #
 ####################################
 class IfStatement < Node
-    attr_accessor :expr, :local_bumpster, :dupster
-    def initialize(a,b,dupster)
+    attr_accessor :expr, :local_bumpster
+    def initialize(a,b)
         @expr = a
         @local_bumpster = b
-        @dupster = dupster
     end
 
     def evaluate()

@@ -5,16 +5,6 @@ require './nodes'
 
 class CMM
 
-    @@var_dupster = {}
-
-    def self.setVar(identifier, value)
-        @@var_dupster[identifier] = value
-    end
-
-    def self.vars(x)
-        return @@var_dupster[x]
-    end
-
     def initialize()
 
         @cmmParser = Parser.new("CMM") do
@@ -31,18 +21,29 @@ class CMM
 
 
             start :program do
-                match(:func_declare) do |x|
-                    x.statements.each_with_index do |val, index|
-                        print "\n#{index + 1}. "; p val
+                match(:func_declares) do |x|
+                    x.each do |c|
+                        c.evaluate()
                     end
-                    puts "\n\n\n"
-                    x.evaluate
+                # x.statements.each_with_index do |val, index|
+                    #     print "\n#{index + 1}. "; p val
+                    # end
+                    # puts "\n\n\n"
                 end
             end
 
+
+            rule :func_declares do
+                match(:func_declares, :func_declare) do |x,c|
+                    x << c
+                    x
+                end
+                match(:func_declare) { |x| [x] }
+            end
+
             rule :func_declare do
-                match(:main) { |x| MainFunction.new(x) }
-                # match(:type, :identifier, '(', :params ')', '{', :code_block, '}') {}
+                match(:main) { |x| MainFunction.new(x)}
+                match(:new_function) {|x| x }
             end
 
             rule :main do
@@ -50,9 +51,14 @@ class CMM
                 match(:type, /codeGoBr[r]+/, '(', ')', '{', :code_blocks, '}') { |_, _, _, _, _, x, _| x }
             end
 
+            rule :new_function do
+                match(:type, :identifier, '(', :params, ')', '{', :code_blocks, '}') do |type,identifier,_,params,_,_,blocks,_|
+                    FunctionDeclaration.new(identifier, CmmFunction.new(type, params, blocks))
+                end
+            end
+
             rule :code_blocks do
                 match(:code_blocks, :code_block) do |x, c|
-
                     if c.class == Array
                         x.concat(c)
                     else
@@ -71,6 +77,13 @@ class CMM
                 match(:while_loop)
                 match(:increment)
                 match(:decrement)
+                match(:call_function)
+            end
+
+            rule :call_function do
+                match(:identifier, '(', :values, ')', ';') do |name,_,params,_,_|
+                    FunctionCall.new(name, params)
+                end
             end
 
             rule :assign do
@@ -93,7 +106,7 @@ class CMM
                     ElifStatment.new(a,b,c)
                 end
                 match('if', '(', :if_expr, ')', '{', :code_blocks, '}') do |_,_,a,_,_,b,_|
-                    IfStatement.new(a, b, @@var_dupster)
+                    IfStatement.new(a, b)
                 end
 
             end
@@ -169,13 +182,16 @@ class CMM
             end
 
             rule :params do
-                match(:haram, :params)
-                match(:haram)
-                match("")
+                match(:params, ',', :haram) do |x,_,c|
+                    x << c
+                    x
+                end
+                match(:haram) {|x| [x]}
+                match(""){|_| []}
             end
 
             rule :haram do
-                match(:type, :identifier)
+                match(:type, :identifier) {|a,b| {b => a}}
             end
 
             rule :type do
@@ -184,6 +200,16 @@ class CMM
                 # match("string")
                 match("bool") { |x| x }
                 match("void") { |x| x }
+            end
+
+            rule :values do
+                match(:values, ',', :value) do |a,_,b|
+                    a << b
+                    a
+                end
+                match(:value) do |x|
+                    [x]
+                end
             end
 
             rule :value do
@@ -224,7 +250,6 @@ class CMM
                 end
                 match('(', :expr, ')') { |_, a, _| a }
             end
-
         end
     end
 
@@ -242,6 +267,6 @@ class CMM
 end
 
 c_minus_minus = CMM.new()
-c_minus_minus.log(false)
+c_minus_minus.log()
 cmmFile = File.read("tests.cmm")
 c_minus_minus.parse(cmmFile)

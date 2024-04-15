@@ -1,9 +1,18 @@
+void test(int a, int b){
+    PRINT(a);
+    PRINT(b);
+    test2(a);
+}
+
+
+void test2(int x){
+    PRINT(x*2);
+}
+
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     float var1 = 4.6;
     int var2 = 10 + 5;
     int c = 10;
-    while(c >= 0){
-        PRINT(c);
-        c--;
-    }
+    test(10, 5);
 }
+
