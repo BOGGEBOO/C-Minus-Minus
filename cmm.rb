@@ -115,6 +115,9 @@ class CMM
                 match(:value, :operator, :value) do |val1, op, val2|
                     BinaryExpression.new(val1, op, val2)
                 end
+                match(:boolean) do |bool|
+                    UnaryExpression.new(bool)
+                end
             end
 
             rule :else_statement do
@@ -213,12 +216,16 @@ class CMM
             end
 
             rule :value do
-                match("True") { |x| x }
-                match("False") { |x| x }
+                match(:boolean) { |x| x }
                 match(:expr) { |x| x }
                 match(Integer)
                 match(Float)
 
+            end
+
+            rule :boolean do
+                match("True") { |x| x }
+                match("False") { |x| x }
             end
 
             rule :identifier do
@@ -244,7 +251,9 @@ class CMM
 
             rule :num do
                 match(Integer) { |x| CmmInteger.new(x) }
+                match('-', Integer) { |_,x| CmmInteger.new(x * -1)}
                 match(Float) { |x| CmmFloat.new(x) }
+                match('-', Float) { |_,x| CmmFloat.new(x * -1)}
                 match(:identifier) do |a|
                     LookUp.new(a)
                 end
@@ -267,6 +276,6 @@ class CMM
 end
 
 c_minus_minus = CMM.new()
-c_minus_minus.log()
+c_minus_minus.log(true)
 cmmFile = File.read("tests.cmm")
 c_minus_minus.parse(cmmFile)

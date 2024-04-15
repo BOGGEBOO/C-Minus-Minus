@@ -110,7 +110,25 @@ class BinaryExpression < Node
         end
         return eval("#{lhtemp}#{@op}#{rhtemp}")
     end
+end
 
+####################################
+#   UNARY EXPRESSION              #
+####################################
+class UnaryExpression < Node
+    attr_accessor :expr
+
+    def initialize(value)
+        if value == "True"
+            @expr = CmmBoolean.new(true)
+        elsif value = "False"
+            @expr = CmmBoolean.new(false)
+        end
+    end
+
+    def evaluate()
+        return @value
+    end
 end
 
 ####################################

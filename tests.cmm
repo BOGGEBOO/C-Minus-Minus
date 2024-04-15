@@ -6,13 +6,23 @@ void test(int a, int b){
 
 
 void test2(int x){
-    PRINT(x*2);
+    int c = 10;
+    while(c >= 0){
+        if(False){
+            PRINT(x*2);
+        }
+        else{
+            PRINT(x*3);
+        }
+        c--;
+    }
+    
 }
 
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     float var1 = 4.6;
     int var2 = 10 + 5;
-    int c = 10;
+    int i = 10;
     test(10, 5);
 }
 
