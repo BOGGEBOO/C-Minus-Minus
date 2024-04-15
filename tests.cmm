@@ -8,11 +8,11 @@ void test(int a, int b){
 void test2(int x){
     int c = 10;
     while(c >= 0){
-        if(False){
-            PRINT(x*2);
+        if(True){
+            PRINT(0);
         }
         else{
-            PRINT(x*3);
+            PRINT(1);
         }
         c--;
     }

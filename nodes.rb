@@ -127,7 +127,7 @@ class UnaryExpression < Node
     end
 
     def evaluate()
-        return @value
+        return @expr.evaluate()
     end
 end
 

@@ -276,6 +276,6 @@ class CMM
 end
 
 c_minus_minus = CMM.new()
-c_minus_minus.log(true)
+c_minus_minus.log()
 cmmFile = File.read("tests.cmm")
 c_minus_minus.parse(cmmFile)
