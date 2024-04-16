@@ -25,10 +25,6 @@ class CMM
                     x.each do |c|
                         c.evaluate()
                     end
-                # x.statements.each_with_index do |val, index|
-                    #     print "\n#{index + 1}. "; p val
-                    # end
-                    # puts "\n\n\n"
                 end
             end
 
@@ -174,12 +170,12 @@ class CMM
                 match(">","=") { |a, b| "#{a}#{b}" }
                 match("<") { |x| x }
                 match(">") { |x| x }
-                match("&","&") { |a, b| "and" }
-                match("|","|") { |a, b| "or" }
+                match("&","&") { |a, b| "#{a}#{b}" }
+                match("|","|") { |a, b| "#{a}#{b}" }
             end
 
             rule :print do
-                match('PRINT', '(', :value, ')', ';') do |_, _, x, _, _|
+                match('print', '(', :value, ')', ';') do |_, _, x, _, _|
                 Print.new(x)
                 end
             end
@@ -199,7 +195,9 @@ class CMM
 
             rule :type do
                 match("int") { |x| x }
+                match("int[]") { |x| x }
                 match("float") { |x| x }
+                match("float[]") { |x| x }
                 # match("string")
                 match("bool") { |x| x }
                 match("void") { |x| x }
@@ -276,6 +274,6 @@ class CMM
 end
 
 c_minus_minus = CMM.new()
-c_minus_minus.log()
+c_minus_minus.log(false)
 cmmFile = File.read("tests.cmm")
 c_minus_minus.parse(cmmFile)

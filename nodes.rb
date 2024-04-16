@@ -113,7 +113,7 @@ class BinaryExpression < Node
 end
 
 ####################################
-#   UNARY EXPRESSION              #
+#      UNARY EXPRESSION            #
 ####################################
 class UnaryExpression < Node
     attr_accessor :expr
@@ -264,7 +264,7 @@ class Assignment < Node
         when "int"
             if @value.is_a?(AritmheticExpression)
                 #p @value
-                $scope[$scope_depth][@identifier] = @value
+                $scope[$scope_depth][@identifier] = @value.evaluate()
             else
                 $scope[$scope_depth][@identifier] = @value
             end
