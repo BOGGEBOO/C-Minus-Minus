@@ -14,9 +14,17 @@ class Node
 end
 
 ####################################
+#    EXPRESSION NODE               #
+####################################
+class ExpressionNode < Node
+    def evaluate()
+    end
+end
+
+####################################
 #   ARITHMETIC EXPRESSION          #
 ####################################
-class AritmheticExpression < Node
+class AritmheticExpression < ExpressionNode
     attr_reader :lhs, :op, :rhs
     def initialize(lhs, op, rhs)
         @lhs = lhs
@@ -90,7 +98,7 @@ end
 ####################################
 #   BINARY EXPRESSION              #
 ####################################
-class BinaryExpression < Node
+class BinaryExpression < ExpressionNode
     attr_reader :lhs, :op, :rhs
 
     def initialize(lhs, op, rhs)
@@ -115,15 +123,11 @@ end
 ####################################
 #      UNARY EXPRESSION            #
 ####################################
-class UnaryExpression < Node
+class UnaryExpression < ExpressionNode
     attr_accessor :expr
 
     def initialize(value)
-        if value == "True"
-            @expr = CmmBoolean.new(true)
-        elsif value = "False"
-            @expr = CmmBoolean.new(false)
-        end
+        @expr = value
     end
 
     def evaluate()
@@ -185,11 +189,59 @@ class CmmFunction < Node
         end
 
         @codeBlock.each do |x|
+            if x.is_a?(CmmReturn)
+                return x.evaluate(@type)
+            end
             x.evaluate()
         end
         $scope_depth -=1
         $scope.pop()
     end
+end
+
+####################################
+#   CMM RETURN                     #
+####################################
+class CmmReturn < Node
+    attr_accessor :thing
+
+    def initialize(thing)
+        @thing = thing
+    end
+
+    def evaluate(type)
+        p @thing
+        if @thing.is_a?(LookUp) or @thing.is_a?(ExpressionNode)
+            @thing = @thing.evaluate
+            if @thing
+                @thing = CmmBoolean.new(true)
+            elsif !@thing
+                @thing = CmmBoolean.new(false)
+            end
+        end
+        p @thing
+        case @thing
+        when CmmInteger
+            check = "int"
+            puts "INT"
+        when CmmFloat
+            check = "float"
+            puts "FLOAT"
+        when CmmBoolean
+            check = "bool"
+            puts "NAAAH"
+        else
+            begin
+                raise(SyntaxError)
+            rescue SyntaxError
+                abort("ERROR: incorrect return type, you dumb fuck".red())
+            end
+        end
+        if check == type
+            return @thing
+        end
+    end
+
 end
 
 ####################################
@@ -293,6 +345,7 @@ class MainFunction < Node
     end
 
     def evaluate()
+        #p @statements
         @statements.each do |x|
             x.evaluate()
         end
@@ -455,18 +508,71 @@ class WhileLoop < Node
     end
 
     def evaluate()
+        broken = false
         $scope << {}
         $scope_depth +=1
+        $scope[$scope_depth]["42069_looper"] = {"break" => false}
         while @expr.evaluate()
             @local_bumpster.each() do |x|
                 x.evaluate()
+                if $scope[$scope_depth]["42069_looper"]["break"]
+                    broken = true
+                    break
+                # else
+                #     x.evaluate()
+                end
+            end
+            if broken
+                break
             end
         end
+
         $scope_depth -=1
         $scope.pop()
     end
 end
 
+####################################
+#       FOR LOOP                   #
+####################################
+class ForLoop < Node
+    attr_accessor :var, :expr, :creme, :blocks
+
+    def initialize(var, expr, creme, blocks)
+        @var = var
+        @expr = expr
+        @creme = creme
+        @blocks = blocks
+    end
+
+    def evaluate()
+        $scope << {}
+        $scope_depth +=1
+        @var.evaluate()
+        @blocks << @creme
+        loopObj = WhileLoop.new(@expr, @blocks)
+        loopObj.evaluate()
+    end
+end
+####################################
+#       CMM BREAK                  #
+####################################
+class CmmBreak
+    def initialize()
+    end
+
+    def evaluate()
+        index = $scope_depth
+        while index >= 0
+            if $scope[index]["42069_looper"]
+                $scope[index]["42069_looper"]["break"] = true
+                break
+            else
+                index -= 1
+            end
+        end
+    end
+end
 ####################################
 #       INCREMENT                  #
 ####################################

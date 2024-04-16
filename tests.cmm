@@ -1,7 +1,7 @@
-void test(int a, int b){
+bool test(int a, int b){
     print(a);
     print(b);
-    test2(a);
+    return 1==1;
 }
 
 
@@ -9,22 +9,21 @@ void test2(int x){
     int c = 10;
     int a = -10 + 5;
     print(a);
-    while(c >= 0){
-        if(True){
-            print(0);
-        }
-        else{
-            print(1);
+    while(c > 0){
+        print(c);
+        if(c == 5){
+            print(1111);
+            break;
         }
         c--;
     }
-    
 }
 
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     float var1 = 4.6;
     int var2 = 10 + 5;
     int i = 10;
-    test(10, 5);
+    test(10, 20);
+   
 }
 

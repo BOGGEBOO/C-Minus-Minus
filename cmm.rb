@@ -43,8 +43,8 @@ class CMM
             end
 
             rule :main do
-                match(:type, /codeGoBr[r]+/, '(', ')', '{', '}') { 0 }
-                match(:type, /codeGoBr[r]+/, '(', ')', '{', :code_blocks, '}') { |_, _, _, _, _, x, _| x }
+                match('void', /codeGoBr[r]+/, '(', ')', '{', '}') { 0 }
+                match('void', /codeGoBr[r]+/, '(', ')', '{', :code_blocks, '}') { |_, _, _, _, _, x, _| x }
             end
 
             rule :new_function do
@@ -66,14 +66,17 @@ class CMM
             end
 
             rule :code_block do
-                match(:assign)
+                match(:assign, ';')
                 match(:print)
                 match(:if_statement)
                 match(:change_var)
                 match(:while_loop)
-                match(:increment)
-                match(:decrement)
+                match(:for_loop)
+                match(:increment, ';')
+                match(:decrement, ';')
                 match(:call_function)
+                match(:break)
+                match(:return, ';')
             end
 
             rule :call_function do
@@ -82,8 +85,13 @@ class CMM
                 end
             end
 
+            rule :return do
+                match('return', :if_expr) { |_,x| CmmReturn.new(x)}
+                match('return', :value) {|_,x| CmmReturn.new(x)}
+            end
+
             rule :assign do
-                match(:type, :identifier, '=', :value, ';') do |type, identifier, _, value, _|
+                match(:type, :identifier, '=', :value) do |type, identifier, _, value|
                     Assignment.new(identifier, value, type)
                 end
             end
@@ -151,14 +159,27 @@ class CMM
                 end
             end
 
+            rule :for_loop do
+                match('for', '(', :assign, ';', :if_expr, ';', :increment, ')', '{', :code_blocks, '}') do |_,_,assign,_,expr,_,increment,_,_,blocks,_|
+                    ForLoop.new(assign, expr, increment, blocks)
+                end
+                match('for', '(', :assign, ';',:if_expr, ';', :decrement, ')', '{', :code_blocks, '}') do |_,_,assign,_,expr,_,decrement,_,_,blocks,_|
+                    ForLoop.new(assign, expr, decrement, blocks)
+                end
+            end
+
+            rule :break do
+                match('break', ';') { |_,_| CmmBreak.new() }
+            end
+
             rule :increment do
-                match(:value, '+', '+', ';') do |a,_,_,_|
+                match(:value, '+', '+') do |a,_,_|
                     Increment.new(a)
                 end
             end
 
             rule :decrement do
-                match(:value, '-', '-', ';') do |a,_,_,_|
+                match(:value, '-', '-') do |a,_,_|
                     Decrement.new(a)
                 end
             end
@@ -222,8 +243,8 @@ class CMM
             end
 
             rule :boolean do
-                match("True") { |x| x }
-                match("False") { |x| x }
+                match("True") { CmmBoolean.new(true) }
+                match("False") { CmmBoolean.new(false) }
             end
 
             rule :identifier do
