@@ -74,13 +74,13 @@ class CMM
                 match(:for_loop)
                 match(:increment, ';')
                 match(:decrement, ';')
-                match(:call_function)
+                match(:call_function, ';')
                 match(:break)
                 match(:return, ';')
             end
 
             rule :call_function do
-                match(:identifier, '(', :values, ')', ';') do |name,_,params,_,_|
+                match(:identifier, '(', :values, ')') do |name,_,params,_,_|
                     FunctionCall.new(name, params)
                 end
             end
@@ -91,6 +91,9 @@ class CMM
             end
 
             rule :assign do
+                match(:type, :identifier, '=', :call_function) do |type, identifier, _, value|
+                    Assignment.new(identifier, value, type)
+                end
                 match(:type, :identifier, '=', :value) do |type, identifier, _, value|
                     Assignment.new(identifier, value, type)
                 end

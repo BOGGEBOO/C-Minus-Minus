@@ -1,29 +1,19 @@
-bool test(int a, int b){
-    print(a);
-    print(b);
-    return 1==1;
+int add(int a, int b){
+    return a+b;
 }
 
 
-void test2(int x){
-    int c = 10;
-    int a = -10 + 5;
-    print(a);
-    while(c > 0){
-        print(c);
-        if(c == 5){
-            print(1111);
-            break;
-        }
-        c--;
-    }
+int test(int x){
+    x++;
+    return x;
 }
 
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     float var1 = 4.6;
     int var2 = 10 + 5;
     int i = 10;
-    test(10, 20);
-   
+    int var = add(10, 20);
+    print(var);
+    int knas = test(10);
+    print(knas);
 }
-

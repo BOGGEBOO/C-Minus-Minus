@@ -187,7 +187,7 @@ class CmmFunction < Node
                 $scope[$scope_depth][@params[index].keys()[0]] = value
             end
         end
-
+        p @codeBlock
         @codeBlock.each do |x|
             if x.is_a?(CmmReturn)
                 return x.evaluate(@type)
@@ -210,26 +210,26 @@ class CmmReturn < Node
     end
 
     def evaluate(type)
-        p @thing
+        # p @thing
         if @thing.is_a?(LookUp) or @thing.is_a?(ExpressionNode)
             @thing = @thing.evaluate
-            if @thing
+            if @thing == true
                 @thing = CmmBoolean.new(true)
-            elsif !@thing
+            elsif @thing == false
                 @thing = CmmBoolean.new(false)
             end
         end
-        p @thing
+        # p @thing
         case @thing
         when CmmInteger
             check = "int"
-            puts "INT"
+            # puts "INT"
         when CmmFloat
             check = "float"
-            puts "FLOAT"
+            # puts "FLOAT"
         when CmmBoolean
             check = "bool"
-            puts "NAAAH"
+            # puts "NAAAH"
         else
             begin
                 raise(SyntaxError)
