@@ -185,12 +185,17 @@ class CmmFunction < Node
             end
             if replacePossible
                 $scope[$scope_depth][@params[index].keys()[0]] = value
+            else
+                begin
+                    raise(SyntaxError)
+                rescue SyntaxError
+                    abort("ERROR: faulty parameter, you dumb fuck".red())
+                end
             end
         end
         @codeBlock.each do |x|
-            p x
-            puts "*********"
             if x.is_a?(CmmReturn)
+
                 return x.evaluate(@type)
                 break
             end
@@ -316,8 +321,9 @@ class Assignment < Node
     def evaluate()
         case @type
         when "int"
-            if @value.is_a?(AritmheticExpression)
-                #p @value
+            if @value.is_a?(ExpressionNode)
+                $scope[$scope_depth][@identifier] = @value.evaluate()
+            elsif @value.is_a?(FunctionCall)
                 $scope[$scope_depth][@identifier] = @value.evaluate()
             else
                 $scope[$scope_depth][@identifier] = @value

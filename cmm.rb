@@ -91,9 +91,9 @@ class CMM
             end
 
             rule :assign do
-                # match(:type, :identifier, '=', :call_function) do |type, identifier, _, value|
-                #     Assignment.new(identifier, value, type)
-                # end
+                match(:type, :identifier, '=', :call_function) do |type, identifier, _, value|
+                    Assignment.new(identifier, value, type)
+                end
                 match(:type, :identifier, '=', :value) do |type, identifier, _, value|
                     Assignment.new(identifier, value, type)
                 end
