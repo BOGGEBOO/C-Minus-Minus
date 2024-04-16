@@ -187,10 +187,12 @@ class CmmFunction < Node
                 $scope[$scope_depth][@params[index].keys()[0]] = value
             end
         end
-        p @codeBlock
         @codeBlock.each do |x|
+            p x
+            puts "*********"
             if x.is_a?(CmmReturn)
                 return x.evaluate(@type)
+                break
             end
             x.evaluate()
         end

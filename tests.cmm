@@ -3,17 +3,15 @@ int add(int a, int b){
 }
 
 
-int test(int x){
-    x++;
-    return x;
+void test(int x){
+    print(x+1);
+    print(x);
+    print(x-1);
 }
 
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     float var1 = 4.6;
     int var2 = 10 + 5;
     int i = 10;
-    int var = add(10, 20);
-    print(var);
-    int knas = test(10);
-    print(knas);
+    add(10, 20);
 }
