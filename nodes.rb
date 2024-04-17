@@ -30,34 +30,23 @@ class AritmheticExpression < ExpressionNode
         @lhs = lhs
         @op = op
         @rhs = rhs
-        # p @lhs
     end
 
     def evaluate()
         lhtemp = @lhs
         while lhtemp.is_a?(Node)
-            # p lhtemp
             lhtemp = lhtemp.evaluate()
-            # p lhtemp
         end
         rhtemp = @rhs
         while rhtemp.is_a?(Node)
             rhtemp = rhtemp.evaluate()
         end
-        # p rhtemp
         result = eval("#{lhtemp}#{@op}#{rhtemp}")
         if result.is_a?(Integer)
-            # p CmmInteger.new(result)
             return CmmInteger.new(result)
         elsif result.is_a?(Float)
             return CmmFloat.new(result)
         end
-        # case result.class
-        # when Integer
-
-        # when Float
-
-        # end
     end
 end
 
@@ -262,6 +251,10 @@ class FunctionCall < Node
         @params = params
     end
 
+    def gettype()
+        return $funcs[@name].type
+    end
+
     def evaluate()
         $funcs[@name].evaluate(@params)
     end
@@ -318,26 +311,48 @@ class Assignment < Node
         @type = type
     end
 
+    def typecheck(cmmtype)
+        if @value.is_a?(ExpressionNode)
+            if @value.evaluate().is_a?(cmmtype)
+                $scope[$scope_depth][@identifier] = @value.evaluate()
+            else
+                begin
+                    raise(SyntaxError)
+                rescue SyntaxError
+                    abort("ERROR: '#{@value.evaluate().evaluate()}' is not of type '#{@type}', you dumb fuck".red())
+                end
+            end
+        elsif @value.is_a?(FunctionCall)
+            if @value.gettype() == @type
+                $scope[$scope_depth][@identifier] = @value.evaluate()
+            else
+                begin
+                    raise(SyntaxError)
+                rescue SyntaxError
+                    abort("ERROR: '#{@value.evaluate().evaluate()}' is not of type '#{@type}', you dumb fuck".red())
+                end
+            end
+        else
+            if @value.is_a?(cmmtype)
+                $scope[$scope_depth][@identifier] = @value
+            else
+                begin
+                    raise(SyntaxError)
+                rescue SyntaxError
+                    abort("ERROR: '#{@value.evaluate()}' is not of type '#{@type}', you dumb fuck".red())
+                end
+            end
+        end
+    end
+
     def evaluate()
         case @type
         when "int"
-            if @value.is_a?(ExpressionNode)
-                $scope[$scope_depth][@identifier] = @value.evaluate()
-            elsif @value.is_a?(FunctionCall)
-                $scope[$scope_depth][@identifier] = @value.evaluate()
-            else
-                $scope[$scope_depth][@identifier] = @value
-            end
+            typecheck(CmmInteger)
         when "float"
-            $scope[$scope_depth][@identifier] = @value
+            typecheck(CmmFloat)
         when "bool"
-            # cant send false from :value
-            if @value == "True"
-                temp = true
-            elsif @value == "False"
-                temp = false
-            end
-            $scope[$scope_depth][@identifier] = CmmBoolean.new(@value)
+            typecheck(CmmBoolean)
         end
     end
 end

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require './rdparse'
-require './nodes'
+require './requireNodes'
 
 
 class CMM
@@ -179,11 +179,17 @@ class CMM
                 match(:value, '+', '+') do |a,_,_|
                     Increment.new(a)
                 end
+                match(:value, '+', '=', :num) do |a,_,_,b|
+                    Increment.new(a,b)
+                end
             end
 
             rule :decrement do
                 match(:value, '-', '-') do |a,_,_|
                     Decrement.new(a)
+                end
+                match(:value, '+', '=', :num) do |a,_,_,b|
+                    Decrement.new(a,b)
                 end
             end
 
@@ -238,11 +244,11 @@ class CMM
             end
 
             rule :value do
+                match(:call_function) {|x| x}
                 match(:boolean) { |x| x }
                 match(:expr) { |x| x }
                 match(Integer)
                 match(Float)
-
             end
 
             rule :boolean do
