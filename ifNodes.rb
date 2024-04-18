@@ -29,7 +29,11 @@ class IfStatement < ContainerNode
         $scope_depth += 1
         if @expr.evaluate()
             @local_bumpster.each() do |x|
-                x.evaluate()
+                if x.is_a?(CmmReturn)
+                    return x
+                else
+                    x.evaluate()
+                end
             end
         end
         $scope_depth -=1
@@ -72,10 +76,18 @@ class ElifStatment < ContainerNode
         $scope_depth +=1
         if @expr.evaluate()
             @local_bumpster.each() do |x|
-                x.evaluate()
+                if x.is_a?(CmmReturn)
+                    return x
+                else
+                    x.evaluate()
+                end
             end
         elsif @next_elif != nil
-            @next_elif.evaluate()
+            if @next_elif.evaluate().is_a?(CmmReturn)
+                return @next_elif.evaluate()
+            else
+                @next_elif.evaluate()
+            end
         end
         $scope_depth -=1
         $scope.pop()
@@ -97,7 +109,11 @@ class ElseStatment < ContainerNode
         $scope << {}
         $scope_depth +=1
         @local_bumpster.each() do |x|
-            x.evaluate()
+            if x.is_a?(CmmReturn)
+                return x
+            else
+                x.evaluate()
+            end
         end
         $scope_depth -=1
         $scope.pop()

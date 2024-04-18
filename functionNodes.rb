@@ -46,7 +46,9 @@ class CmmFunction < Node
         end
         ret = 0
         @codeBlock.each do |x|
-            if x.is_a?(CmmReturn)
+            if x.evaluate.is_a?(CmmReturn)
+                return x.evaluate()
+            elsif x.is_a?(CmmReturn)
                 return x.evaluate()
             else
                 x.evaluate

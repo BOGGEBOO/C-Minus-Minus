@@ -3,6 +3,7 @@ int increment(int i){
         return i;
     }
     else{
+        print(i);
         i++;
         return increment(i);
     }
@@ -11,12 +12,10 @@ int increment(int i){
 int test(int a, int b){
     if(a+b==10){
         return 1;
-    }else{
-        return 0;
     }
 }
 
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     print(increment(1));
-    print(5, 5;)
+    print(test(5,5));
 }
