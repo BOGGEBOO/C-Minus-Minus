@@ -2,6 +2,17 @@ int add(int a, int b){
     return a+b;
 }
 
+int increment(int i){
+    if(i == 5){
+        return i;
+    }
+    else{
+        print(i);
+        i++;
+        return increment(i);
+    }
+}
+
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     float var1 = 4.6;
     int var2 = 10 + 5;
@@ -9,5 +20,5 @@ void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     i++;
     print(i);
     int func = add(5, 10);
-    print(func + 15);
+    print(increment(1));
 }
