@@ -43,8 +43,8 @@ class CMM
             end
 
             rule :main do
-                match('void', /codeGoBr[r]+/, '(', ')', '{', '}') { 0 }
-                match('void', /codeGoBr[r]+/, '(', ')', '{', :code_blocks, '}') { |_, _, _, _, _, x, _| x }
+                match('void', /codeGoBrr[r]+/, '(', ')', '{', '}') { 0 }
+                match('void', /codeGoBrr[r]+/, '(', ')', '{', :code_blocks, '}') { |_, _, _, _, _, x, _| x }
             end
 
             rule :new_function do
