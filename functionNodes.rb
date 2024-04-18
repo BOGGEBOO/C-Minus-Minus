@@ -43,12 +43,14 @@ class CmmFunction < Node
         end
         @codeBlock.each do |x|
             if x.is_a?(CmmReturn)
-
+                # p @type
                 return x.evaluate(@type)
                 break
             end
+            # p x
             x.evaluate()
         end
+
         $scope_depth -=1
         $scope.pop()
     end
