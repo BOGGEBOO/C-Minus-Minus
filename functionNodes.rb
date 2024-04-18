@@ -21,14 +21,17 @@ class CmmFunction < Node
             if @params[index][@params[0].keys()[index]] == "int" && values[index].class == CmmInteger
                 replacePossible = true
             elsif @params[index][@params[0].keys()[index]] == "int" && values[index].evaluate.class == CmmInteger
+                value = values[index].evaluate
                 replacePossible = true
             elsif @params[index][@params[0].keys()[index]] == "float" && values[index].class == CmmFloat
                 replacePossible = true
             elsif @params[index][@params[0].keys()[index]] == "float" && values[index].evaluate.class == CmmFloat
+                value = values[index].evaluate
                 replacePossible = true
             elsif @params[index][@params[0].keys()[index]] == "bool" && values[index].class == CmmBoolean
                 replacePossible = true
             elsif @params[index][@params[0].keys()[index]] == "bool" && values[index].evaluate.class == CmmBoolean
+                value = values[index].evaluate
                 replacePossible = true
             end
             if replacePossible
@@ -41,14 +44,13 @@ class CmmFunction < Node
                 end
             end
         end
+        ret = 0
         @codeBlock.each do |x|
             if x.is_a?(CmmReturn)
-                # p @type
-                return x.evaluate(@type)
-                break
+                return x.evaluate()
+            else
+                x.evaluate
             end
-            # p x
-            x.evaluate()
         end
 
         $scope_depth -=1
@@ -60,14 +62,16 @@ end
 #   CMM RETURN                     #
 ####################################
 class CmmReturn < Node
-    attr_accessor :thing
+    attr_accessor :thing, :type
 
     def initialize(thing)
         @thing = thing
+        @type = nil
     end
 
-    def evaluate(type)
-        # p @thing
+    def evaluate()
+
+        #p @thing
         if @thing.is_a?(LookUp) or @thing.is_a?(ExpressionNode)
             @thing = @thing.evaluate
             if @thing == true
@@ -76,26 +80,37 @@ class CmmReturn < Node
                 @thing = CmmBoolean.new(false)
             end
         end
-        # p @thing
+        #p @thing
         case @thing
         when CmmInteger
             check = "int"
-            # puts "INT"
         when CmmFloat
             check = "float"
-            # puts "FLOAT"
         when CmmBoolean
             check = "bool"
-            # puts "NAAAH"
+        when FunctionCall
+            # p @thing.gettype()
+            # p @type
+            check = @thing.gettype()
         else
+            # p @thing
+            # p @type
             begin
                 raise(SyntaxError)
             rescue SyntaxError
                 abort("ERROR: incorrect return type, you dumb fuck".red())
             end
         end
-        if check == type
-            return @thing
+        # puts "**********"
+        # p @type
+        # p check
+        if check == @type
+            #p @thing
+            if @thing.is_a?(FunctionCall)
+                @thing.evaluate()
+            else
+                return @thing
+            end
         end
     end
 
@@ -117,6 +132,23 @@ class FunctionCall < Node
     end
 
     def evaluate()
+        # p "WWWWWW"
+        $funcs[@name].codeBlock.each do |x|
+            if x.is_a?(ContainerNode)
+                x.has_return.each do |c|
+                    if c.type == nil
+                        c.type = gettype()
+                    end
+                end
+                if x.is_a?(ElifStatment)
+                    x.returns = []
+                end
+            elsif x.is_a?(CmmReturn)
+                if x.type == nil
+                    x.type = gettype()
+                end
+            end
+        end
         $funcs[@name].evaluate(@params)
     end
 end

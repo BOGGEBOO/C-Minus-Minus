@@ -247,8 +247,8 @@ class CMM
                 match(:call_function) {|x| x}
                 match(:boolean) { |x| x }
                 match(:expr) { |x| x }
-                match(Integer)
-                match(Float)
+                # match(Integer)
+                # match(Float)
             end
 
             rule :boolean do

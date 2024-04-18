@@ -1,8 +1,23 @@
 # require './baseNodes'
+
+class ContainerNode < Node
+    def initialize()
+    end
+
+    def has_return()
+        @local_bumpster.each() do |x|
+            if x.is_a?(CmmReturn)
+                return [x]
+            end
+        end
+    end
+
+end
+
 ####################################
 #   IF STATEMENT                   #
 ####################################
-class IfStatement < Node
+class IfStatement < ContainerNode
     attr_accessor :expr, :local_bumpster
     def initialize(a,b)
         @expr = a
@@ -25,13 +40,31 @@ end
 ####################################
 #   ELSE IF STATEMENT              #
 ####################################
-class ElifStatment < Node
-    attr_accessor :expr, :local_bumpster, :next_elif
+class ElifStatment < ContainerNode
+    attr_accessor :expr, :local_bumpster, :next_elif, :returns
 
     def initialize(expr, bumpster, elif = nil)
         @expr = expr
         @local_bumpster = bumpster
         @next_elif = elif
+        @@returns = []
+    end
+
+    def has_return()
+        found = false
+        @local_bumpster.each() do |x|
+            if x.is_a?(CmmReturn)
+                @@returns << x
+            end
+        end
+        if @next_elif != nil
+            if @next_elif.is_a?(ElseStatment)
+                @@returns.concat(@next_elif.has_return())
+            else
+                @next_elif.has_return()
+            end
+        end
+        return @@returns
     end
 
     def evaluate()
@@ -53,7 +86,7 @@ end
 ####################################
 #   ELSE STATEMENT                 #
 ####################################
-class ElseStatment < Node
+class ElseStatment < ContainerNode
     attr_accessor :bumpster
 
     def initialize(bumpster)
