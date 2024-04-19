@@ -2,7 +2,7 @@
 ####################################
 #       WHILE LOOP                 #
 ####################################
-class WhileLoop < Node
+class WhileLoop < ContainerNode
     attr_accessor :expr, :bumpster
 
     def initialize(expr, bumpster)
@@ -17,12 +17,18 @@ class WhileLoop < Node
         $scope[$scope_depth]["42069_looper"] = {"break" => false}
         while @expr.evaluate()
             @local_bumpster.each() do |x|
-                x.evaluate()
+                if x.is_a?(CmmReturn)
+                    return x
+                elsif x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
+                    $scope_depth -= 1
+                    $scope.pop()
+                    return x.evaluate()
+                else
+                    x.evaluate()
+                end
                 if $scope[$scope_depth]["42069_looper"]["break"]
                     broken = true
                     break
-                # else
-                #     x.evaluate()
                 end
             end
             if broken
@@ -38,22 +44,22 @@ end
 ####################################
 #       FOR LOOP                   #
 ####################################
-class ForLoop < Node
-    attr_accessor :var, :expr, :creme, :blocks
+class ForLoop < ContainerNode
+    attr_accessor :var, :expr, :creme, :local_bumpster
 
     def initialize(var, expr, creme, blocks)
         @var = var
         @expr = expr
         @creme = creme
-        @blocks = blocks
+        @local_bumpster = blocks
     end
 
     def evaluate()
         $scope << {}
         $scope_depth +=1
         @var.evaluate()
-        @blocks << @creme
-        loopObj = WhileLoop.new(@expr, @blocks)
+        @local_bumpster << @creme
+        loopObj = WhileLoop.new(@expr, @local_bumpster)
         loopObj.evaluate()
     end
 end

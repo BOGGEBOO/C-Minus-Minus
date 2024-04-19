@@ -85,6 +85,23 @@ class CmmInteger < Node
 end
 
 ####################################
+#   CMM Char                    #
+####################################
+class CmmChar < Node
+
+    attr_accessor :value
+
+    def initialize(val)
+        @value = val
+    end
+
+    def evaluate()
+        return @value
+    end
+
+end
+
+####################################
 #   BINARY EXPRESSION              #
 ####################################
 class BinaryExpression < ExpressionNode

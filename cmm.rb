@@ -15,7 +15,8 @@ class CMM
             token(/;/) { |x| x }
             token(/True/) { |x| x }
             token(/False/) { |x| x }
-
+            token(/\/\/.*$/)
+            token(/#.*$/)
             # Längst ner yo
             token(/./) { |x| x }
 
@@ -43,13 +44,16 @@ class CMM
             end
 
             rule :main do
-                match('void', /codeGoBrr[r]+/, '(', ')', '{', '}') { 0 }
+                match('void', /codeGoBrr[r]+/, '(', ')', '{', '}') { [] }
                 match('void', /codeGoBrr[r]+/, '(', ')', '{', :code_blocks, '}') { |_, _, _, _, _, x, _| x }
             end
 
             rule :new_function do
                 match(:type, :identifier, '(', :params, ')', '{', :code_blocks, '}') do |type,identifier,_,params,_,_,blocks,_|
                     FunctionDeclaration.new(identifier, CmmFunction.new(type, params, blocks))
+                end
+                match(:type, :identifier, '(', ')', '{', :code_blocks, '}') do |type,identifier,_,_,_,blocks,_|
+                    FunctionDeclaration.new(identifier, CmmFunction.new(type, blocks))
                 end
             end
 
@@ -83,11 +87,15 @@ class CMM
                 match(:identifier, '(', :values, ')') do |name,_,params,_,_|
                     FunctionCall.new(name, params)
                 end
+                match(:identifier, '(', ')') do |name,_,_|
+                    FunctionCall.new(name)
+                end
             end
 
             rule :return do
                 match('return', :if_expr) { |_,x| CmmReturn.new(x)}
                 match('return', :value) {|_,x| CmmReturn.new(x)}
+                match('return') { |_| CmmReturn.new()}
             end
 
             rule :assign do
@@ -225,11 +233,10 @@ class CMM
 
             rule :type do
                 match("int") { |x| x }
-                match("int[]") { |x| x }
                 match("float") { |x| x }
-                match("float[]") { |x| x }
                 # match("string")
                 match("bool") { |x| x }
+                match("char") { |x| x }
                 match("void") { |x| x }
             end
 
@@ -244,9 +251,10 @@ class CMM
             end
 
             rule :value do
-                match(:call_function) {|x| x}
+                match(:call_function) { |x| x}
                 match(:boolean) { |x| x }
                 match(:expr) { |x| x }
+                match("'", /\w{1}/, "'") { |_,x,_| CmmChar.new(x) }
                 # match(Integer)
                 # match(Float)
             end

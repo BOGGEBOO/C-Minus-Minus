@@ -3,7 +3,6 @@ int increment(int i){
         return i;
     }
     else{
-        print(i);
         i++;
         return increment(i);
     }
@@ -16,8 +15,41 @@ int test(int a, int b){
     return 2;
 }
 
+int testNestingWhile(int i){
+    while(i < 10){
+        if(i == 6){
+            return i;
+        }
+        i++;
+    }
+    return 6969696969;
+}
+
+void test(){
+    return 11111;
+}
+
+int testNestingFor(int j){
+    for(int i = 0; i < 10; i++){
+        if(i == 44){
+            return 1;
+        }
+    }
+    return 2;
+}
+
+int returnType(){
+    return 2;
+}
+
+char testChar(char a){
+    return a;
+}
+
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
-    print(increment(1));
-    print(test(6,5));
-    print((((((((((((((((((((((((((((((((((4))))))))))))))))))))))))))))))))))
+    // print(testNestingFor(1));
+    // print(returnType());
+    // test();
+    char c1 = 'a';
+    print(testChar(c1));
 }

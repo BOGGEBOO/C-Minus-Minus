@@ -53,6 +53,8 @@ class Assignment < Node
             typecheck(CmmFloat)
         when "bool"
             typecheck(CmmBoolean)
+        when "char"
+            typecheck(CmmChar)
         end
     end
 end
@@ -86,10 +88,10 @@ class LookUp < Node
             end
         end
         while true
-            if temp.class == CmmInteger || temp.class == CmmFloat
+            if temp.class == CmmInteger || temp.class == CmmFloat || temp.class == CmmChar
                 break
-            elsif temp.evaluate.class != CmmInteger || temp.evaluate.class != CmmFloat
-                temp = temp.evaluate
+            elsif temp.evaluate().class != CmmInteger || temp.evaluate().class != CmmFloat || temp.evaluate().class != CmmChar
+                temp = temp.evaluate()
             end
         end
 

@@ -8,10 +8,28 @@ class ContainerNode < Node
         @local_bumpster.each() do |x|
             if x.is_a?(CmmReturn)
                 return [x]
+            elsif x.is_a?(ContainerNode)
+                return x.has_return()
             end
         end
+        return []
     end
 
+    def will_return()
+        if @expr.evaluate()
+            @local_bumpster.each() do |x|
+                if x.is_a?(CmmReturn)
+                    return x
+                elsif x.is_a?(ContainerNode)
+                    return x.will_return()
+                else
+                    return x
+                end
+            end
+        else
+            return nil
+        end
+    end
 end
 
 ####################################
@@ -31,6 +49,10 @@ class IfStatement < ContainerNode
             @local_bumpster.each() do |x|
                 if x.is_a?(CmmReturn)
                     return x
+                elsif x.will_return().is_a?(CmmReturn)
+                    $scope_depth -= 1
+                    $scope.pop()
+                    return x.evaluate()
                 else
                     x.evaluate()
                 end
@@ -78,6 +100,10 @@ class ElifStatment < ContainerNode
             @local_bumpster.each() do |x|
                 if x.is_a?(CmmReturn)
                     return x
+                elsif x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
+                    $scope_depth -= 1
+                    $scope.pop()
+                    return x.evaluate()
                 else
                     x.evaluate()
                 end
@@ -111,11 +137,27 @@ class ElseStatment < ContainerNode
         @local_bumpster.each() do |x|
             if x.is_a?(CmmReturn)
                 return x
+            elsif x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
+                $scope_depth -= 1
+                $scope.pop()
+                return x.evaluate()
             else
                 x.evaluate()
             end
         end
         $scope_depth -=1
         $scope.pop()
+    end
+
+    def will_return()
+        @local_bumpster.each() do |x|
+            if x.is_a?(CmmReturn)
+                return x
+            elsif x.is_a?(ContainerNode)
+                return x.will_return()
+            else
+                return x
+            end
+        end
     end
 end

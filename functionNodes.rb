@@ -5,7 +5,7 @@
 class CmmFunction < Node
     attr_accessor :type, :params, :codeBlock
 
-    def initialize(type, params, codeBlock)
+    def initialize(type, params = [], codeBlock)
         @type = type
         @params = params
         @codeBlock = codeBlock
@@ -16,7 +16,6 @@ class CmmFunction < Node
         $scope_depth +=1
         replacePossible = false
 
-        #p values[0].evaluate
         values.each_with_index do |value,index|
             if @params[index][@params[0].keys()[index]] == "int" && values[index].class == CmmInteger
                 replacePossible = true
@@ -33,6 +32,11 @@ class CmmFunction < Node
             elsif @params[index][@params[0].keys()[index]] == "bool" && values[index].evaluate.class == CmmBoolean
                 value = values[index].evaluate
                 replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "char" && values[index].class == CmmChar
+                replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "char" && values[index].evaluate.class == CmmChar
+                value = values[index].evaluate
+                replacePossible = true
             end
             if replacePossible
                 $scope[$scope_depth][@params[index].keys()[0]] = value
@@ -46,7 +50,10 @@ class CmmFunction < Node
         end
         ret = 0
         @codeBlock.each do |x|
-            if x.evaluate.is_a?(CmmReturn)
+            if x.is_a?(ContainerNode) and x.evaluate.is_a?(CmmReturn)
+                #removing the scope created by the 'x' object since it didn't do it itself due to returning x
+                $scope_depth -=1
+                $scope.pop()
                 return x.evaluate()
             elsif x.is_a?(CmmReturn)
                 return x.evaluate()
@@ -56,7 +63,10 @@ class CmmFunction < Node
         end
 
         $scope_depth -=1
-        $scope.pop()
+        ret = $scope.pop()
+        if ret.is_a?(Hash)
+            abort("ERROR: function does not return a '#{@type}', you dumb fuck".red())
+        end
     end
 end
 
@@ -66,14 +76,12 @@ end
 class CmmReturn < Node
     attr_accessor :thing, :type
 
-    def initialize(thing)
+    def initialize(thing = nil)
         @thing = thing
         @type = nil
     end
 
     def evaluate()
-
-        #p @thing
         if @thing.is_a?(LookUp) or @thing.is_a?(ExpressionNode)
             @thing = @thing.evaluate
             if @thing == true
@@ -82,7 +90,6 @@ class CmmReturn < Node
                 @thing = CmmBoolean.new(false)
             end
         end
-        #p @thing
         case @thing
         when CmmInteger
             check = "int"
@@ -90,28 +97,39 @@ class CmmReturn < Node
             check = "float"
         when CmmBoolean
             check = "bool"
+        when CmmChar
+            check = "char"
         when FunctionCall
-            # p @thing.gettype()
-            # p @type
             check = @thing.gettype()
         else
-            # p @thing
-            # p @type
             begin
                 raise(SyntaxError)
             rescue SyntaxError
-                abort("ERROR: incorrect return type, you dumb fuck".red())
+                if @thing == nil
+                    abort("ERROR: #{@type}-function must '#{@type}', you dumb fuck".red())
+                else
+                    abort("ERROR: '#{@thing}' is not returnable, you dumb fuck".red())
+                end
             end
         end
-        # puts "**********"
-        # p @type
-        # p check
+        if @type == "void" and @thing != nil
+            begin
+                raise(SyntaxError)
+            rescue SyntaxError
+                abort("ERROR: void function can not have 'return', you dumb fuck".red())
+            end
+        end
         if check == @type
-            #p @thing
             if @thing.is_a?(FunctionCall)
                 @thing.evaluate()
             else
                 return @thing
+            end
+        else
+            begin
+                raise(SyntaxError)
+            rescue SyntaxError
+                abort("ERROR: '#{check}' is not of type '#{@type}', you dumb fuck".red())
             end
         end
     end
@@ -124,7 +142,7 @@ end
 class FunctionCall < Node
     attr_accessor :name, :params
 
-    def initialize(name, params)
+    def initialize(name, params = [])
         @name = name
         @params = params
     end
@@ -134,10 +152,9 @@ class FunctionCall < Node
     end
 
     def evaluate()
-        # p "WWWWWW"
         $funcs[@name].codeBlock.each do |x|
             if x.is_a?(ContainerNode)
-                x.has_return.each do |c|
+                x.has_return().each do |c|
                     if c.type == nil
                         c.type = gettype()
                     end
@@ -183,11 +200,9 @@ class MainFunction < Node
     end
 
     def evaluate()
-        #p @statements
         @statements.each do |x|
             x.evaluate()
         end
         #! se variabellista
-        #p $scope
     end
 end
