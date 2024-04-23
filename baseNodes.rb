@@ -122,7 +122,11 @@ class BinaryExpression < ExpressionNode
         while rhtemp.is_a?(Node)
             rhtemp = rhtemp.evaluate()
         end
-        return eval("#{lhtemp}#{@op}#{rhtemp}")
+        if lhtemp.is_a?(String) and rhtemp.is_a?(String)
+            return eval("'#{lhtemp}'#{@op}'#{rhtemp}'")
+        else
+            return eval("#{lhtemp}#{@op}#{rhtemp}")
+        end
     end
 end
 
@@ -181,9 +185,92 @@ class Print < Node
     end
 end
 
+class ListNode < Node
+    attr_accessor :list, :type
+
+    def initialize(vals, type)
+        @vals = vals
+        @type = type
+        @list = typecheck()
+    end
+
+    def typecheck()
+        case @type
+        when "int"
+            checker(CmmInteger)
+        when "float"
+            checker(CmmFloat)
+        when "bool"
+            checker(CmmBoolean)
+        when "char"
+            checker(CmmChar)
+        end
+        return LinkedList.new(@vals)
+    end
+
+    def checker(cmmtype)
+        @vals.each do |x|
+            if x.is_a?(ExpressionNode)
+                if x.evaluate().is_a?(cmmtype)
+                    next
+                else
+                    begin
+                        raise(SyntaxError)
+                    rescue SyntaxError
+                        abort("ERROR: List of wrong type, bitch".red())
+                    end
+                end
+            else
+                if x.is_a?(cmmtype)
+                    next
+                else
+                    begin
+                        raise(SyntaxError)
+                    rescue SyntaxError
+                        abort("ERROR: List is of wrong type, bitch".red())
+                    end
+                end
+            end
+        end
+    end
+
+    def evaluate()
+        return @list.print()
+    end
+
+end
+
+class ListOpp < Node
+    attr_accessor :identifier, :index, :op, :list, :new_val
+
+    def initialize(identifier, index, op, new_val = 0)
+        @identifier = identifier
+        @index = index
+        @op = op
+        @new_val = new_val
+    end
+
+    def evaluate()
+        @list = @identifier.evaluate()
+        case @op
+        when "index"
+            @list.list.at(@index)
+        when "append"
+            @list.list.append(@index)
+        when "pop"
+            @list.list.pop()
+        when "size"
+            @list.list.size()
+        when "replace"
+            @list.list.replace_at(@index, @new_val)
+        end
+    end
+
+end
+
 
 class String
     def red
-    "\e[31m#{self}\e[0m"
+        "\e[31m#{self}\e[0m"
     end
 end

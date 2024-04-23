@@ -70,6 +70,7 @@ class CMM
             end
 
             rule :code_block do
+                match(:list_opp, ';')
                 match(:assign, ';')
                 match(:print)
                 match(:if_statement)
@@ -81,6 +82,7 @@ class CMM
                 match(:call_function, ';')
                 match(:break)
                 match(:return, ';')
+
             end
 
             rule :call_function do
@@ -105,6 +107,36 @@ class CMM
                 match(:type, :identifier, '=', :value) do |type, identifier, _, value|
                     Assignment.new(identifier, value, type)
                 end
+                match('array', '<', :type, '>', :identifier, '=', :value) do |_,_,type,_,identifier,_,value|
+                    Assignment.new(identifier, ListNode.new(value, type), "array")
+
+                end
+                match('array', '<', :type, '>', :identifier, '=', '[',']') do |_,_,type,_,identifier,_,_,_|
+                    Assignment.new(identifier, ListNode.new([], type), "array")
+                end
+            end
+
+            rule :list_opp do
+                match(:identifier, '[', :index_opp, ']', '=', :value) do |id,_,x,_,_,val|
+                    ListOpp.new(LookUp.new(id), x, "replace", val)
+                end
+                match(:identifier, '[', :index_opp, ']') do |id,_,x,_|
+                    ListOpp.new(LookUp.new(id), x, "index")
+                end
+                match(:identifier, '.','append','(', :value, ')') do |id,_,_,_,x,_|
+                    ListOpp.new(LookUp.new(id), x, "append")
+                end
+                match(:identifier, '.','pop','(',')') do |id,_,_,_,_|
+                    ListOpp.new(LookUp.new(id), 0, "pop")
+                end
+                match(:identifier, '.','size','(',')') do |id,_,_,_,_|
+                    ListOpp.new(LookUp.new(id), 0, "size")
+                end
+            end
+
+            rule :index_opp do
+                match(Integer) { |x| x }
+                match(:value) { |x| x }
             end
 
             rule :change_var do
@@ -214,7 +246,7 @@ class CMM
 
             rule :print do
                 match('print', '(', :value, ')', ';') do |_, _, x, _, _|
-                Print.new(x)
+                    Print.new(x)
                 end
             end
 
@@ -254,7 +286,7 @@ class CMM
                 match(:call_function) { |x| x}
                 match(:boolean) { |x| x }
                 match(:expr) { |x| x }
-                match("'", /\w{1}/, "'") { |_,x,_| CmmChar.new(x) }
+                match('[', :exprs, ']') {|_,x,_| x}
                 # match(Integer)
                 # match(Float)
             end
@@ -266,6 +298,14 @@ class CMM
 
             rule :identifier do
                 match(/[a-z]+[\w]*/)
+            end
+
+            rule :exprs do
+                match(:exprs, ',', :expr) do |x,_,c|
+                    x << c
+                    x
+                end
+                match(:expr) { |x| [x] }
             end
 
             rule :expr do
@@ -290,9 +330,11 @@ class CMM
                 match('-', Integer) { |_,x| CmmInteger.new(x * -1)}
                 match(Float) { |x| CmmFloat.new(x) }
                 match('-', Float) { |_,x| CmmFloat.new(x * -1)}
+                match(:list_opp) { |x| x }
                 match(:identifier) do |a|
                     LookUp.new(a)
                 end
+                match("'", /\w{1}/, "'") { |_,x,_| CmmChar.new(x) }
                 match('(', :expr, ')') { |_, a, _| a }
             end
         end

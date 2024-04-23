@@ -2,8 +2,11 @@ class LinkedList
 
     attr_accessor :head
 
-    def initialize()
+    def initialize(vals = [])
         @head = nil
+        vals.each do |x|
+            append(x)
+        end
     end
 
     def append(value)
@@ -16,8 +19,41 @@ class LinkedList
 
     def at(index)
         if @head == nil
-            return nil
-            # TODO Raise index out of range fel
+            begin
+                raise(SyntaxError)
+            rescue SyntaxError
+                abort("ERROR: List index out of range, bucko".red())
+            end
+        end
+        if index.is_a?(AritmheticExpression)
+            index = index.evaluate().evaluate()
+        end
+        follower = @head
+        if index == 0
+            return follower.seg_value
+        end
+        for i in (0..index-1) do
+            if follower.next == nil
+                begin
+                    raise(SyntaxError)
+                rescue SyntaxError
+                    abort("ERROR: List index out of range, bucko".red())
+                end
+            else
+                follower = follower.next
+            end
+        end
+        return follower.seg_value
+    end
+
+
+    def private_at(index)
+        if @head == nil
+            begin
+                raise(SyntaxError)
+            rescue SyntaxError
+                abort("ERROR: List index out of range, bucko".red())
+            end
         end
         follower = @head
         if index == 0
@@ -25,7 +61,11 @@ class LinkedList
         end
         for i in (0..index-1) do
             if follower.next == nil
-                # TODO Raise index out of range fel
+                begin
+                    raise(SyntaxError)
+                rescue SyntaxError
+                    abort("ERROR: List index out of range, bucko".red())
+                end
             else
                 follower = follower.next
             end
@@ -53,20 +93,20 @@ class LinkedList
 
     def pop()
         seg = last()
-        prev = at(size()-2)
+        prev = private_at(size()-2)
         prev.next = nil
-        return seg
+        return seg.seg_value
     end
 
     def remove_at(index)
-        curr = at(index)
-        prev = at(index-1)
+        curr = private_at(index)
+        prev = private_at(index-1)
         prev.next = curr.next
     end
 
     def replace_at(index, val)
-        location = at(index)
-        location.value = val
+        location = private_at(index)
+        location.seg_value = val
     end
 
     def last()
@@ -93,7 +133,7 @@ class LinkedList
         else
             follower = @head
             while true
-                to_print += follower.value.to_s
+                to_print += follower.seg_value.evaluate().to_s()
                 if follower.next == nil
                     to_print += "]"
                     break
@@ -106,34 +146,20 @@ class LinkedList
 
         return to_print
     end
+
+    def to_s
+        # TODO gör typ string jao
+    end
 end
 
 
 
 class Segment
 
-    attr_accessor :value, :next
+    attr_accessor :seg_value, :next
 
     def initialize(value, n = nil)
-        @value = value
+        @seg_value = value
         @next = n
     end
 end
-
-
-l = LinkedList.new()
-
-l.append(1)
-l.append(29)
-l.append(3)
-l.append(10)
-l.append(22)
-l.append(69)
-
-# p l.size()
-# l.replace_at(2, 420)
-# p l.size()
-
-# p l.at(2)
-
-puts l.print()

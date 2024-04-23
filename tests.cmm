@@ -1,58 +1,10 @@
-#int increment(int i){
-#    if(i == 5){
-#        return i;
-#    }
-#    else{
-#        i++;
-#        return increment(i);
-#    }
-#}
-
-#int test(int a, int b){
-#    if(a+b==10){
-#        return 1;
-#    }
-#    return 2;
-#}
-
-#int testNestingWhile(int i){
-#    while(i < 10){
-#        if(i == 6){
-#            return i;
-#        }
-#        i++;
-#    }
-#    return 6969696969;
-#}
-
-#void test(){
-#    return 11111;
-#}
-
-#int testNestingFor(int j){
-#    for(int i = 0; i < 10; i++){
-#        if(i == 44){
-#            return 1;
-#        }
-#    }
-#    return 2;
-#}
-
-#int returnType(){
-#    return 2;
-#}
-
-char testChar(char a){
-    #if(a == 'b'){
-    #    return 'a';
-    #}
-    return 'b';
-}
-
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
-    // print(testNestingFor(1));
-    // print(returnType());
-    // test();
-    char c1 = 'b';
-    print(testChar(c1));
+    array<char> cool = ['a','b','c'];
+    array<float> notSoCool = [1.2, 3.14];
+    print(cool);
+    cool[0] = 'd';
+    cool.pop();
+    cool.append('u');
+    print(cool[cool.size()-1]);
+    print(cool);
 }

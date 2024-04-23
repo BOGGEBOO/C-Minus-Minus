@@ -55,6 +55,8 @@ class Assignment < Node
             typecheck(CmmBoolean)
         when "char"
             typecheck(CmmChar)
+        when "array"
+            $scope[$scope_depth][@identifier] = @value
         end
     end
 end
@@ -88,9 +90,9 @@ class LookUp < Node
             end
         end
         while true
-            if temp.class == CmmInteger || temp.class == CmmFloat || temp.class == CmmChar
+            if temp.class == CmmInteger || temp.class == CmmFloat || temp.class == CmmChar || temp.class == ListNode
                 break
-            elsif temp.evaluate().class != CmmInteger || temp.evaluate().class != CmmFloat || temp.evaluate().class != CmmChar
+            elsif temp.evaluate().class != CmmInteger || temp.evaluate().class != CmmFloat || temp.evaluate().class != CmmChar || temp.evaluate().class != ListNode
                 temp = temp.evaluate()
             end
         end
