@@ -185,89 +185,48 @@ class Print < Node
     end
 end
 
-class ListNode < Node
-    attr_accessor :list, :type
+class CmmInput < Node
 
-    def initialize(vals, type)
-        @vals = vals
+    attr_accessor :type
+
+    def initialize(type)
         @type = type
-        @list = typecheck()
     end
 
-    def typecheck()
+    def evaluate()
+        input = gets.chomp
+
         case @type
         when "int"
-            checker(CmmInteger)
-        when "float"
-            checker(CmmFloat)
-        when "bool"
-            checker(CmmBoolean)
-        when "char"
-            checker(CmmChar)
-        end
-        return LinkedList.new(@vals)
-    end
-
-    def checker(cmmtype)
-        @vals.each do |x|
-            if x.is_a?(ExpressionNode)
-                if x.evaluate().is_a?(cmmtype)
-                    next
-                else
-                    begin
-                        raise(SyntaxError)
-                    rescue SyntaxError
-                        abort("ERROR: List of wrong type, bitch".red())
-                    end
-                end
-            else
-                if x.is_a?(cmmtype)
-                    next
-                else
-                    begin
-                        raise(SyntaxError)
-                    rescue SyntaxError
-                        abort("ERROR: List is of wrong type, bitch".red())
-                    end
-                end
+            begin
+                input = Integer(input)
+                input = CmmInteger.new(input)
+            rescue ArgumentError
+                abort("ERROR: Variable type does not match input type, imbicile".red())
             end
+        when "float"
+            begin
+                input = Float(input)
+                input = CmmFloat.new(input)
+            rescue ArgumentError
+                abort("ERROR: Variable type does not match input type, imbicile".red())
+            end
+        when "char"
+            if input.length == 1
+                input = CmmChar.new(input)
+            else
+                abort("ERROR: Variable type does not match input type, imbicile".red())
+            end
+        when "string"
+            input = CmmString.new(input.to_s)
+        else
+            abort("ERROR: Input of this type is not allowed, imbicile".red())
         end
-    end
 
-    def evaluate()
-        return @list.print()
+        return input
     end
 
 end
-
-class ListOpp < Node
-    attr_accessor :identifier, :index, :op, :list, :new_val
-
-    def initialize(identifier, index, op, new_val = 0)
-        @identifier = identifier
-        @index = index
-        @op = op
-        @new_val = new_val
-    end
-
-    def evaluate()
-        @list = @identifier.evaluate()
-        case @op
-        when "index"
-            @list.list.at(@index)
-        when "append"
-            @list.list.append(@index)
-        when "pop"
-            @list.list.pop()
-        when "size"
-            @list.list.size()
-        when "replace"
-            @list.list.replace_at(@index, @new_val)
-        end
-    end
-
-end
-
 
 class String
     def red

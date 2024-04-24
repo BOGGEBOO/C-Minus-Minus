@@ -1,10 +1,5 @@
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
-    array<char> cool = ['a','b','c'];
-    array<float> notSoCool = [1.2, 3.14];
-    print(cool);
-    cool[0] = 'd';
-    cool.pop();
-    cool.append('u');
-    print(cool[cool.size()-1]);
-    print(cool);
+    //print("Enter: ");
+    //string i = input();
+    print("hejn geetet");
 }

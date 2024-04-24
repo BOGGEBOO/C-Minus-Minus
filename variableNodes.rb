@@ -46,6 +46,9 @@ class Assignment < Node
     end
 
     def evaluate()
+        if @value.is_a?(CmmInput)
+            @value = @value.evaluate()
+        end
         case @type
         when "int"
             typecheck(CmmInteger)
@@ -55,6 +58,8 @@ class Assignment < Node
             typecheck(CmmBoolean)
         when "char"
             typecheck(CmmChar)
+        when "string"
+            typecheck(CmmString)
         when "array"
             $scope[$scope_depth][@identifier] = @value
         end
@@ -90,9 +95,12 @@ class LookUp < Node
             end
         end
         while true
-            if temp.class == CmmInteger || temp.class == CmmFloat || temp.class == CmmChar || temp.class == ListNode
+            if temp.class == CmmInteger || temp.class == CmmFloat || temp.class == CmmChar ||
+                temp.class == ListNode || temp.class == CmmString || temp.class == CmmBoolean
                 break
-            elsif temp.evaluate().class != CmmInteger || temp.evaluate().class != CmmFloat || temp.evaluate().class != CmmChar || temp.evaluate().class != ListNode
+            elsif temp.evaluate().class != CmmInteger || temp.evaluate().class != CmmFloat ||
+                 temp.evaluate().class != CmmChar || temp.evaluate().class != ListNode ||
+                 temp.evaluate().class != CmmString || temp.evaluate().class != CmmBoolean
                 temp = temp.evaluate()
             end
         end

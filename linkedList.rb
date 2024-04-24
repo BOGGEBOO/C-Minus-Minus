@@ -148,7 +148,23 @@ class LinkedList
     end
 
     def to_s
-        # TODO gör typ string jao
+        to_print = ""
+        if @head == nil
+            to_print += ""
+            return to_print
+        else
+            follower = @head
+            while true
+                to_print += follower.seg_value
+                if follower.next == nil
+                    break
+                else
+                    follower = follower.next
+                end
+            end
+        end
+
+        return to_print
     end
 end
 
