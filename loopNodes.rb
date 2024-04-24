@@ -95,8 +95,11 @@ class Increment < Node
     end
 
     def evaluate()
+        if @inc.class == LookUp
+            @inc = @inc.evaluate()
+        end
         if @value.class == LookUp
-            ChangeVariable.new(@value.identifier, @value.evaluate.evaluate + @inc.evaluate()).evaluate()
+            ChangeVariable.new(@value.identifier, @value.evaluate().evaluate() + @inc.evaluate()).evaluate()
         else
             @value.value = @value.value + @inc.evaluate()
         end

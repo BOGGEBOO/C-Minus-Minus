@@ -391,5 +391,5 @@ end
 
 c_minus_minus = CMM.new()
 c_minus_minus.log(false)
-cmmFile = File.read("tests.cmm")
+cmmFile = File.read(ARGV[0])
 c_minus_minus.parse(cmmFile)

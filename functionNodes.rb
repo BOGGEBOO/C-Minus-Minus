@@ -65,7 +65,9 @@ class CmmFunction < Node
         $scope_depth -=1
         ret = $scope.pop()
         if ret.is_a?(Hash)
-            abort("ERROR: function does not return a '#{@type}', you dumb fuck".red())
+            unless @type == "void"
+                abort("ERROR: function does not return a '#{@type}', you dumb fuck".red())
+            end
         end
     end
 end
