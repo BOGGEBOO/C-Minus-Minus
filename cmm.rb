@@ -82,6 +82,9 @@ class CMM
                 match(:for_loop)
                 match(:increment, ';')
                 match(:decrement, ';')
+                match(:multiment, ';')
+                match(:diviment, ';')
+                match(:potensiment, ';')
                 match(:call_function, ';')
                 match(:break)
                 match(:return, ';')
@@ -257,6 +260,24 @@ class CMM
                 end
             end
 
+            rule :multiment do
+                match(:value, '*', '=', :num) do |a,_,_,b|
+                    Multiment.new(a,b)
+                end
+            end
+
+            rule :diviment do
+                match(:value, '/', '=', :num) do |a,_,_,b|
+                    Diviment.new(a,b)
+                end
+            end
+
+            rule :potensiment do
+                match(:value, '*', '*', '=', :num) do |a,_,_,_,b|
+                    Potensiment.new(a,b)
+                end
+            end
+
             rule :operator do
                 match("=","=") { |a, b| "#{a}#{b}" }
                 match("!","=") { |a, b| "#{a}#{b}" }
@@ -264,6 +285,7 @@ class CMM
                 match(">","=") { |a, b| "#{a}#{b}" }
                 match("<") { |x| x }
                 match(">") { |x| x }
+                match("%") { |x| x }
                 match("&","&") { |a, b| "#{a}#{b}" }
                 match("|","|") { |a, b| "#{a}#{b}" }
             end
@@ -341,6 +363,7 @@ class CMM
             rule :term do
                 match(:term, '*', :expo) { |a, _, b| AritmheticExpression.new(a, '*', b) }
                 match(:term, '/', :expo) { |a, _, b| AritmheticExpression.new(a, '/', b) }
+                match(:term, '%', :expo) { |a, _, b| AritmheticExpression.new(a, '%', b) }
                 match(:expo)
             end
 

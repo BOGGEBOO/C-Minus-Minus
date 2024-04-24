@@ -9,7 +9,7 @@ int sums(){
 int product(){
     int prod = 1;
     for(int i = 1; i <= 512; i++){
-        prod = prod * i;
+        prod *= i;
     }
     return prod;
 }
@@ -18,9 +18,13 @@ int product(){
 
 void codeGoBrrrrrrrrrrr(){
     # fixa så att string kan innehålla siffror
-    
-    print("Summan av alla tal upp till femhundratolv:");
-    print(sums());
-    print("Produkten av alla tal upp till femhundratolv:");
-    print(product());
+
+    #print("Summan av alla tal upp till femhundratolv:");
+    #print(sums());
+    #print("Produkten av alla tal upp till femhundratolv:");
+    #print(product());
+    int i = 11 % 3;
+    print(i);
+    i **= 3;
+    print(i);
 }

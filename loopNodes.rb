@@ -118,10 +118,76 @@ class Decrement < Node
     end
 
     def evaluate()
+        if @dec.class == LookUp
+            @dec = @dec.evaluate()
+        end
         if @value.class == LookUp
             ChangeVariable.new(@value.identifier, @value.evaluate.evaluate - @dec.evaluate()).evaluate()
         else
             @value.value = @value.value - @dec.evaluate()
+        end
+    end
+end
+
+
+class Multiment < Node
+    attr_accessor :value
+
+    def initialize(value, dec = CmmInteger.new(1))
+        @value = value
+        @dec = dec
+    end
+
+    def evaluate()
+        if @dec.class == LookUp
+            @dec = @dec.evaluate()
+        end
+        if @value.class == LookUp
+            ChangeVariable.new(@value.identifier, @value.evaluate.evaluate * @dec.evaluate()).evaluate()
+        else
+            @value.value = @value.value * @dec.evaluate()
+        end
+    end
+end
+
+
+class Diviment < Node
+    attr_accessor :value
+
+    def initialize(value, dec = CmmInteger.new(1))
+        @value = value
+        @dec = dec
+    end
+
+    def evaluate()
+        if @dec.class == LookUp
+            @dec = @dec.evaluate()
+        end
+        if @value.class == LookUp
+            ChangeVariable.new(@value.identifier, @value.evaluate.evaluate / @dec.evaluate()).evaluate()
+        else
+            @value.value = @value.value / @dec.evaluate()
+        end
+    end
+end
+
+
+class Potensiment < Node
+    attr_accessor :value
+
+    def initialize(value, dec = CmmInteger.new(1))
+        @value = value
+        @dec = dec
+    end
+
+    def evaluate()
+        if @dec.class == LookUp
+            @dec = @dec.evaluate()
+        end
+        if @value.class == LookUp
+            ChangeVariable.new(@value.identifier, @value.evaluate.evaluate ** @dec.evaluate()).evaluate()
+        else
+            @value.value = @value.value ** @dec.evaluate()
         end
     end
 end
