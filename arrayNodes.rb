@@ -71,6 +71,9 @@ class ListOpp < Node
 
     def evaluate()
         @list = @identifier.evaluate()
+        if !@list.list
+            @list.evaluate()
+        end
         case @op
         when "index"
             @list.list.at(@index)
