@@ -28,6 +28,9 @@ class LinkedList
         if index.is_a?(AritmheticExpression)
             index = index.evaluate().evaluate()
         end
+        if index.is_a?(CmmInteger)
+            index = index.evaluate()
+        end
         follower = @head
         if index == 0
             return follower.seg_value
@@ -133,7 +136,11 @@ class LinkedList
         else
             follower = @head
             while true
-                to_print += follower.seg_value.evaluate().to_s()
+                if follower.seg_value.is_a?(LookUp) || follower.seg_value.is_a?(AritmheticExpression)
+                    to_print += follower.seg_value.evaluate().evaluate().to_s()
+                else
+                    to_print += follower.seg_value.evaluate().to_s()
+                end
                 if follower.next == nil
                     to_print += "]"
                     break

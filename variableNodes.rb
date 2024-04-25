@@ -79,6 +79,7 @@ class LookUp < Node
 
     def evaluate()
         index = $scope_depth
+        temp = nil
         while index >= 0
             if $scope[index][@identifier]
                 temp = $scope[index][@identifier]

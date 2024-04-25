@@ -13,7 +13,8 @@ class WhileLoop < ContainerNode
     def evaluate()
         broken = false
         $scope << {}
-        $scope_depth +=1
+        $scope_depth += 1
+
         $scope[$scope_depth]["42069_looper"] = {"break" => false}
         while @expr.evaluate()
             @local_bumpster.each() do |x|
@@ -26,16 +27,17 @@ class WhileLoop < ContainerNode
                 else
                     x.evaluate()
                 end
-                if $scope[$scope_depth]["42069_looper"]["break"]
-                    broken = true
-                    break
+                if $scope[$scope_depth]["42069_looper"]
+                    if $scope[$scope_depth]["42069_looper"]["break"]
+                        broken = true
+                        break
+                    end
                 end
             end
             if broken
                 break
             end
         end
-
         $scope_depth -=1
         $scope.pop()
     end
@@ -45,22 +47,48 @@ end
 #       FOR LOOP                   #
 ####################################
 class ForLoop < ContainerNode
-    attr_accessor :var, :expr, :creme, :local_bumpster
+    attr_accessor :var, :expr, :crement, :local_bumpster
 
-    def initialize(var, expr, creme, blocks)
+    def initialize(var, expr, crement, blocks)
         @var = var
         @expr = expr
-        @creme = creme
+        @crement = crement
         @local_bumpster = blocks
     end
 
     def evaluate()
+        broken = false
         $scope << {}
-        $scope_depth +=1
+        $scope_depth += 1
         @var.evaluate()
-        @local_bumpster << @creme
-        loopObj = WhileLoop.new(@expr, @local_bumpster)
-        loopObj.evaluate()
+
+        $scope[$scope_depth]["42069_looper"] = {"break" => false}
+        while @expr.evaluate()
+            @local_bumpster.each() do |x|
+                if x.is_a?(CmmReturn)
+                    return x
+                elsif x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
+                    $scope_depth -= 1
+                    $scope.pop()
+                    return x.evaluate()
+                else
+                    x.evaluate()
+                end
+                if $scope[$scope_depth]["42069_looper"]
+                    if $scope[$scope_depth]["42069_looper"]["break"]
+                        broken = true
+                        break
+                    end
+                end
+            end
+            if broken
+                break
+            end
+        end
+        @var.value.value = 0
+        $scope_depth -=1
+        $scope.pop()
+
     end
 end
 ####################################

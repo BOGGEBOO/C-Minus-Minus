@@ -61,6 +61,7 @@ void codeGoBrrrrrrrrrrr(){
     else {
         print("test 7: rätt");
     }
+    
     //Den tuggar lite
     if(1 <= 1){
         if(100000 > 1){
@@ -84,8 +85,5 @@ void codeGoBrrrrrrrrrrr(){
     else {
         print(fel);
     }
-    int x = 10;
-    #check in linked list if lookup
-    array<int> a = [x,1];
-    print(a);
+    
 }

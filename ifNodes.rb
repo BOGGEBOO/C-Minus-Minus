@@ -16,18 +16,14 @@ class ContainerNode < Node
     end
 
     def will_return()
-        if @expr.evaluate()
-            @local_bumpster.each() do |x|
-                if x.is_a?(CmmReturn)
-                    return x
-                elsif x.is_a?(ContainerNode)
-                    return x.will_return()
-                else
-                    return x
-                end
+        @local_bumpster.each() do |x|
+            if x.is_a?(CmmReturn)
+                return x
+            elsif x.is_a?(ContainerNode)
+                return x.will_return()
+            else
+                return x
             end
-        else
-            return nil
         end
     end
 end

@@ -7,7 +7,6 @@ class ListNode < Node
     def initialize(vals, type)
         @vals = vals
         @type = type
-        @list = typecheck()
     end
 
     def typecheck()
@@ -26,7 +25,7 @@ class ListNode < Node
 
     def checker(cmmtype)
         @vals.each do |x|
-            if x.is_a?(ExpressionNode)
+            if x.is_a?(ExpressionNode) or x.is_a?(LookUp)
                 if x.evaluate().is_a?(cmmtype)
                     next
                 else
@@ -51,6 +50,7 @@ class ListNode < Node
     end
 
     def evaluate()
+        @list = typecheck()
         return @list.print()
     end
 

@@ -12,7 +12,7 @@ class CMM
             # token(/[^\s"]+/) { |x| x }
             token(/[0-9]*\.[0-9]+/) { |x| x }
             # token(/\d+/) { |x| x.to_i }
-            token(/[\w|:|ä|Ä|å|Å|ö|Ö]+/) { |x| x }
+            token(/[\w|:|ä|Ä|å|Å|ö|Ö|!]+/) { |x| x }
             token(/;/) { |x| x }
             token(/True/) { |x| x }
             token(/False/) { |x| x }
@@ -189,7 +189,7 @@ class CMM
                 match(:value, :operator, :value) do |val1, op, val2|
                     BinaryExpression.new(val1, op, val2)
                 end
-                match(:boolean) do |bool|
+                match(:value) do |bool|
                     UnaryExpression.new(bool)
                 end
             end
@@ -231,9 +231,11 @@ class CMM
 
             rule :for_loop do
                 match('for', '(', :assign, ';', :if_expr, ';', :increment, ')', '{', :code_blocks, '}') do |_,_,assign,_,expr,_,increment,_,_,blocks,_|
+                    blocks << increment
                     ForLoop.new(assign, expr, increment, blocks)
                 end
                 match('for', '(', :assign, ';',:if_expr, ';', :decrement, ')', '{', :code_blocks, '}') do |_,_,assign,_,expr,_,decrement,_,_,blocks,_|
+                    blocks << decrement
                     ForLoop.new(assign, expr, decrement, blocks)
                 end
             end
