@@ -175,12 +175,17 @@ class LinkedList
 
     def conc(val)
         if val.is_a?(LookUp)
-            follower = val.evaluate().list.head
-        else
-            follower = val.list.head
+            val = val.evaluate()
         end
-        while !follower.next.nil?
+        if val.is_a?(ListNode)
+            val.generate_list()
+        end
+        follower = val.list.head
+        while true
             append(follower.seg_value)
+            if follower.next.nil?
+                break
+            end
             follower = follower.next
         end
     end

@@ -4,4 +4,9 @@ void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     a += b;
     a += "ijklmnopqrstuvwxyzåäö";
     print(a);
+
+    array<int> listA = [1,2,3,4];
+    array<int> listB = [5,6];
+    listA.concatinate(listB);
+    print(listA);
 }

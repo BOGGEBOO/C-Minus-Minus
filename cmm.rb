@@ -149,6 +149,9 @@ class CMM
                 match(:identifier, '.','size','(',')') do |id,_,_,_,_|
                     ListOpp.new(LookUp.new(id), 0, "size")
                 end
+                match(:identifier, '.','concatinate','(', :value, ')') do |id,_,_,_,x,_|
+                    ListOpp.new(LookUp.new(id), x, "conc")
+                end
             end
 
             rule :index_opp do

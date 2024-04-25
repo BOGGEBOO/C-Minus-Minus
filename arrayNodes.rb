@@ -49,8 +49,14 @@ class ListNode < Node
         end
     end
 
-    def evaluate()
+    def generate_list()
         @list = typecheck()
+    end
+
+    def evaluate()
+        if !@list
+            generate_list()
+        end
         return @list.print()
     end
 
@@ -83,6 +89,8 @@ class ListOpp < Node
             @list.list.pop()
         when "size"
             @list.list.size()
+        when "conc"
+            @list.list.conc(@index)
         when "replace"
             @list.list.replace_at(@index, @new_val)
         end
