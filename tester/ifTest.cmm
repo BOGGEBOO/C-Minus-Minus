@@ -84,4 +84,8 @@ void codeGoBrrrrrrrrrrr(){
     else {
         print(fel);
     }
+    int x = 10;
+    #check in linked list if lookup
+    array<int> a = [x,1];
+    print(a);
 }
