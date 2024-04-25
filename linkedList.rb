@@ -170,8 +170,19 @@ class LinkedList
                 end
             end
         end
-
         return to_print
+    end
+
+    def conc(val)
+        if val.is_a?(LookUp)
+            follower = val.evaluate().list.head
+        else
+            follower = val.list.head
+        end
+        while !follower.next.nil?
+            append(follower.seg_value)
+            follower = follower.next
+        end
     end
 end
 

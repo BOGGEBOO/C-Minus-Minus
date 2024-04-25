@@ -1,5 +1,7 @@
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
-    int x = 10;
-    array<int> a = [1,2,3,x];
-    print(a[3]);
+    string a = "abcd";
+    string b = "efgh";
+    a += b;
+    a += "ijklmnopqrstuvwxyzåäö";
+    print(a);
 }

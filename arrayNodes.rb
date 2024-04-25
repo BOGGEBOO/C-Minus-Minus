@@ -127,6 +127,8 @@ class StringOpp < Node
             @string.list.at(@index)
         when "size"
             @string.list.size()
+        when "conc"
+            @string.list.conc(@index)
         end
     end
 

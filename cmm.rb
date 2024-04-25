@@ -161,7 +161,10 @@ class CMM
                     StringOpp.new(LookUp.new(id), x, "index")
                 end
                 match(:identifier, '.','size','(',')') do |id,_,_,_,_|
-                    ListOpp.new(LookUp.new(id), 0, "size")
+                    StringOpp.new(LookUp.new(id), 0, "size")
+                end
+                match(:identifier, '+', '=', :value) do |id,_,_,val|
+                    StringOpp.new(LookUp.new(id), val, "conc")
                 end
             end
 
