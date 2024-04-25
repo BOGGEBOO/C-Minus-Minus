@@ -63,6 +63,7 @@ class CmmFloat < Node
     end
 
     def evaluate()
+        @value = @value.round(7)
         return @value
     end
 end

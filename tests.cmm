@@ -1,5 +1,8 @@
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
-    //print("Enter: ");
+    print("Enter: ");
     //string i = input();
-    print("hejn geetet");
+    print("4.3");
+    print("heuigbe 123");
+    print(4);
+    print(3.3);
 }

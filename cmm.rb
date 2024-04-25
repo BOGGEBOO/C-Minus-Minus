@@ -8,11 +8,11 @@ class CMM
     def initialize()
 
         @cmmParser = Parser.new("CMM") do
-            # token(/".*"/) { |x| x.to_s }
             token(/\s+/)
-            token(/\d+\.\d+/) { |x| x.to_f }
-            token(/\d+/) { |x| x.to_i }
-            token(/\w+/) { |x| x }
+            # token(/[^\s"]+/) { |x| x }
+            token(/[0-9]*\.[0-9]+/) { |x| x }
+            # token(/\d+/) { |x| x.to_i }
+            token(/[\w|:|ä|Ä|å|Å|ö|Ö]+/) { |x| x }
             token(/;/) { |x| x }
             token(/True/) { |x| x }
             token(/False/) { |x| x }
@@ -291,6 +291,12 @@ class CMM
             end
 
             rule :print do
+                match("print", "(", "\"", "\"", ")", ";") do |_,_,_,_,_|
+                    Print.new("")
+                end
+                match("print", "(", ")", ";") do |_,_,_,|
+                    Print.new("")
+                end
                 match('print', '(', :value, ')', ';') do |_, _, x, _, _|
                     Print.new(x)
                 end
@@ -373,10 +379,10 @@ class CMM
             end
 
             rule :num do
-                match(Integer) { |x| CmmInteger.new(x) }
-                match('-', Integer) { |_,x| CmmInteger.new(x * -1)}
-                match(Float) { |x| CmmFloat.new(x) }
-                match('-', Float) { |_,x| CmmFloat.new(x * -1)}
+                match(/[0-9]*\.[0-9]+/) { |x| CmmFloat.new(x.to_f) }
+                match(/\d+/) { |x| CmmInteger.new(x.to_i) }
+                match('-', /\d+/) { |_,x| CmmInteger.new(x.to_i * -1)}
+                match('-', /\d+/, '.',/\d+/) { |_,x,_,y| CmmFloat.new(eval("#{x}.#{y}").to_f * -1)}
                 match(:list_opp) { |x| x }
                 match(:identifier) { |a| LookUp.new(a) }
                 match("'", /\w{1}/, "'") { |_,x,_| CmmChar.new(x) }
@@ -394,6 +400,7 @@ class CMM
             end
 
             rule :string_part do
+                match("") { |_| "" }
                 match(/[^\s"]+/) { |x| x }
             end
         end
