@@ -50,7 +50,7 @@ class CmmFunction < Node
         end
         ret = 0
         @codeBlock.each do |x|
-            if x.is_a?(ContainerNode) and x.evaluate.is_a?(CmmReturn)
+            if x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
                 #removing the scope created by the 'x' object since it didn't do it itself due to returning x
                 $scope_depth -=1
                 $scope.pop()

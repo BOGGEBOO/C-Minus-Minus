@@ -1,4 +1,3 @@
-# require './baseNodes'
 ####################################
 #       WHILE LOOP                 #
 ####################################
@@ -58,10 +57,10 @@ class ForLoop < ContainerNode
 
     def evaluate()
         broken = false
+        reset_value = @var.value.value
         $scope << {}
         $scope_depth += 1
         @var.evaluate()
-
         $scope[$scope_depth]["42069_looper"] = {"break" => false}
         while @expr.evaluate()
             @local_bumpster.each() do |x|
@@ -85,7 +84,8 @@ class ForLoop < ContainerNode
                 break
             end
         end
-        @var.value.value = 0
+
+        @var.value.value = reset_value
         $scope_depth -=1
         $scope.pop()
 
@@ -157,7 +157,9 @@ class Decrement < Node
     end
 end
 
-
+####################################
+#       MULTIMENT                  #
+####################################
 class Multiment < Node
     attr_accessor :value
 
@@ -178,7 +180,9 @@ class Multiment < Node
     end
 end
 
-
+####################################
+#       DIVIMENT                   #
+####################################
 class Diviment < Node
     attr_accessor :value
 
@@ -199,7 +203,9 @@ class Diviment < Node
     end
 end
 
-
+####################################
+#       POTENSIMENT                #
+####################################
 class Potensiment < Node
     attr_accessor :value
 

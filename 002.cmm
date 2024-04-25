@@ -17,11 +17,10 @@ int product(){
 }
 
 
-
 void codeGoBrrrrrrrrrrr(){
     print("Summan av alla tal upp till 512:");
     print(sums());
     print();
     print("Produkten av alla tal upp till 512:");
-    //print(product());
+    print(product());
 }
