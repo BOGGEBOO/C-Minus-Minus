@@ -46,12 +46,11 @@ end
 #       FOR LOOP                   #
 ####################################
 class ForLoop < ContainerNode
-    attr_accessor :var, :expr, :crement, :local_bumpster
+    attr_accessor :var, :expr, :local_bumpster
 
-    def initialize(var, expr, crement, blocks)
+    def initialize(var, expr, blocks)
         @var = var
         @expr = expr
-        @crement = crement
         @local_bumpster = blocks
     end
 
@@ -89,6 +88,16 @@ class ForLoop < ContainerNode
         $scope_depth -=1
         $scope.pop()
 
+    end
+
+    def will_return()
+        @local_bumpster.each() do |x|
+            if x.is_a?(CmmReturn)
+                return x
+            elsif x.is_a?(ContainerNode)
+                return x.will_return()
+            end
+        end
     end
 end
 ####################################

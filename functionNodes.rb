@@ -53,12 +53,12 @@ class CmmFunction < Node
             end
         end
         ret = 0
-
         @codeBlock.each do |x|
             if x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
                 #removing the scope created by the 'x' object since it didn't do it itself due to returning x
                 # $scope_depth -=1
                 # $scope.pop()
+                # p x.evaluate
                 return x.evaluate()
             elsif x.is_a?(CmmReturn)
                 return x.evaluate()
@@ -132,6 +132,8 @@ class CmmReturn < Node
             if @thing.is_a?(FunctionCall)
                 @thing.evaluate()
             else
+                $scope_depth -=1
+                $scope.pop()
                 return @thing
             end
         else

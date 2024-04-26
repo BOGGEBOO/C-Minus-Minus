@@ -108,7 +108,9 @@ class CMM
             end
 
             rule :return do
-                match('return', :value) {|_,x| CmmReturn.new(x)}
+                match('return', :expr) { |_,x| CmmReturn.new(x)}
+                match('return', :value) { |_,x| CmmReturn.new(x)}
+
                 match('return', :if_expr) { |_,x| CmmReturn.new(x)}
                 match('return') { |_| CmmReturn.new()}
             end
@@ -238,11 +240,11 @@ class CMM
             rule :for_loop do
                 match('for', '(', :assign, ';', :if_expr, ';', :increment, ')', '{', :code_blocks, '}') do |_,_,assign,_,expr,_,increment,_,_,blocks,_|
                     blocks << increment
-                    ForLoop.new(assign, expr, increment, blocks)
+                    ForLoop.new(assign, expr, blocks)
                 end
                 match('for', '(', :assign, ';',:if_expr, ';', :decrement, ')', '{', :code_blocks, '}') do |_,_,assign,_,expr,_,decrement,_,_,blocks,_|
                     blocks << decrement
-                    ForLoop.new(assign, expr, decrement, blocks)
+                    ForLoop.new(assign, expr, blocks)
                 end
             end
 
@@ -343,7 +345,7 @@ class CMM
             end
 
             rule :value do
-                match(:call_function) { |x| x}
+                #match(:call_function) { |x| x}
                 match(:boolean) { |x| x }
                 match(:expr) { |x| x }
                 match('[', :exprs, ']') {|_,x,_| x}
@@ -387,12 +389,12 @@ class CMM
             end
 
             rule :num do
+                match(:call_function) { |x| x }
                 match(/[0-9]*\.[0-9]+/) { |x| CmmFloat.new(x.to_f) }
                 match(/\d+/) { |x| CmmInteger.new(x.to_i) }
                 match('-', /\d+/) { |_,x| CmmInteger.new(x.to_i * -1)}
                 match('-', /\d+/, '.',/\d+/) { |_,x,_,y| CmmFloat.new(eval("#{x}.#{y}").to_f * -1)}
                 match(:list_opp) { |x| x }
-                match(:call_function) { |x| x }
                 match(:identifier) { |a| LookUp.new(a) }
                 match("'", /\w{1}/, "'") { |_,x,_| CmmChar.new(x) }
                 match("\"", :string, "\"") { |_,x,_| CmmString.new(x) }
