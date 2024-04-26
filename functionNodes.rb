@@ -15,7 +15,6 @@ class CmmFunction < Node
         $scope << {}
         $scope_depth +=1
         replacePossible = false
-
         values.each_with_index do |value,index|
             if @params[index][@params[0].keys()[index]] == "int" && values[index].class == CmmInteger
                 replacePossible = true
@@ -37,6 +36,11 @@ class CmmFunction < Node
             elsif @params[index][@params[0].keys()[index]] == "char" && values[index].evaluate.class == CmmChar
                 value = values[index].evaluate
                 replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "string" && values[index].class == CmmString
+                replacePossible = true
+            elsif @params[index][@params[0].keys()[index]] == "string" && values[index].evaluate.class == CmmString
+                value = values[index].evaluate
+                replacePossible = true
             end
             if replacePossible
                 $scope[$scope_depth][@params[index].keys()[0]] = value
@@ -49,11 +53,12 @@ class CmmFunction < Node
             end
         end
         ret = 0
+
         @codeBlock.each do |x|
             if x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
                 #removing the scope created by the 'x' object since it didn't do it itself due to returning x
-                $scope_depth -=1
-                $scope.pop()
+                # $scope_depth -=1
+                # $scope.pop()
                 return x.evaluate()
             elsif x.is_a?(CmmReturn)
                 return x.evaluate()
@@ -101,6 +106,8 @@ class CmmReturn < Node
             check = "bool"
         when CmmChar
             check = "char"
+        when CmmString
+            check = "string"
         when FunctionCall
             check = @thing.gettype()
         else

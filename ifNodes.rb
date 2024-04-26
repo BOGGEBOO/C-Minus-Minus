@@ -16,13 +16,13 @@ class ContainerNode < Node
     end
 
     def will_return()
-        @local_bumpster.each() do |x|
-            if x.is_a?(CmmReturn)
-                return x
-            elsif x.is_a?(ContainerNode)
-                return x.will_return()
-            else
-                return x
+        if @expr.evaluate()
+            @local_bumpster.each() do |x|
+                if x.is_a?(CmmReturn)
+                    return x
+                elsif x.is_a?(ContainerNode)
+                    return x.will_return()
+                end
             end
         end
     end
@@ -90,6 +90,23 @@ class ElifStatment < ContainerNode
         return @@returns
     end
 
+    def will_return()
+        if @expr.evaluate()
+            @local_bumpster.each() do |x|
+                if x.is_a?(CmmReturn)
+                    return x
+                elsif x.is_a?(ContainerNode)
+                    return x.will_return()
+                end
+            end
+        else
+
+            if @next_elif != nil
+                return @next_elif.will_return()
+            end
+        end
+    end
+
     def evaluate()
         $scope << {}
         $scope_depth +=1
@@ -152,8 +169,6 @@ class ElseStatment < ContainerNode
                 return x
             elsif x.is_a?(ContainerNode)
                 return x.will_return()
-            else
-                return x
             end
         end
     end

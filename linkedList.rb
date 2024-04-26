@@ -62,7 +62,10 @@ class LinkedList
         if index == 0
             return follower
         end
-        for i in (0..index-1) do
+        if index.is_a?(CmmInteger)
+            index = index.evaluate()
+        end
+        for i in (0..index - 1) do
             if follower.next == nil
                 begin
                     raise(SyntaxError)

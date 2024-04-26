@@ -71,6 +71,11 @@ class CMM
             end
 
             rule :code_block do
+                match(:increment, ';')
+                match(:decrement, ';')
+                match(:multiment, ';')
+                match(:diviment, ';')
+                match(:potensiment, ';')
                 match(:list_opp, ';')
                 match(:string_opp, ';')
                 match(:input, ';')
@@ -80,11 +85,6 @@ class CMM
                 match(:change_var)
                 match(:while_loop)
                 match(:for_loop)
-                match(:increment, ';')
-                match(:decrement, ';')
-                match(:multiment, ';')
-                match(:diviment, ';')
-                match(:potensiment, ';')
                 match(:call_function, ';')
                 match(:break)
                 match(:return, ';')
@@ -108,8 +108,8 @@ class CMM
             end
 
             rule :return do
-                match('return', :if_expr) { |_,x| CmmReturn.new(x)}
                 match('return', :value) {|_,x| CmmReturn.new(x)}
+                match('return', :if_expr) { |_,x| CmmReturn.new(x)}
                 match('return') { |_| CmmReturn.new()}
             end
 
@@ -149,7 +149,7 @@ class CMM
                 match(:identifier, '.','size','(',')') do |id,_,_,_,_|
                     ListOpp.new(LookUp.new(id), 0, "size")
                 end
-                match(:identifier, '.','concatinate','(', :value, ')') do |id,_,_,_,x,_|
+                match(:identifier, '.','conga','(', :value, ')') do |id,_,_,_,x,_|
                     ListOpp.new(LookUp.new(id), x, "conc")
                 end
             end
@@ -166,8 +166,8 @@ class CMM
                 match(:identifier, '.','size','(',')') do |id,_,_,_,_|
                     StringOpp.new(LookUp.new(id), 0, "size")
                 end
-                match(:identifier, '+', '=', :value) do |id,_,_,val|
-                    StringOpp.new(LookUp.new(id), val, "conc")
+                match(:identifier, '.','conga','(', :value, ')') do |id,_,_,_,x,_|
+                    StringOpp.new(LookUp.new(id), x, "conc")
                 end
             end
 
@@ -392,10 +392,12 @@ class CMM
                 match('-', /\d+/) { |_,x| CmmInteger.new(x.to_i * -1)}
                 match('-', /\d+/, '.',/\d+/) { |_,x,_,y| CmmFloat.new(eval("#{x}.#{y}").to_f * -1)}
                 match(:list_opp) { |x| x }
+                match(:call_function) { |x| x }
                 match(:identifier) { |a| LookUp.new(a) }
                 match("'", /\w{1}/, "'") { |_,x,_| CmmChar.new(x) }
                 match("\"", :string, "\"") { |_,x,_| CmmString.new(x) }
                 match('(', :expr, ')') { |_, a, _| a }
+
             end
 
             rule :string do
@@ -428,6 +430,6 @@ class CMM
 end
 
 c_minus_minus = CMM.new()
-c_minus_minus.log(false)
+c_minus_minus.log()
 cmmFile = File.read(ARGV[0])
 c_minus_minus.parse(cmmFile)
