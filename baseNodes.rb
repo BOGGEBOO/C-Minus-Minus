@@ -33,6 +33,9 @@ class AritmheticExpression < ExpressionNode
     end
 
     def evaluate()
+        # p @lhs
+        # puts "********"
+        # p @rhs
         lhtemp = @lhs
         while lhtemp.is_a?(Node)
             lhtemp = lhtemp.evaluate()

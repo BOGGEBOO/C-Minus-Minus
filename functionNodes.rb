@@ -81,23 +81,25 @@ end
 #   CMM RETURN                     #
 ####################################
 class CmmReturn < Node
-    attr_accessor :thing, :type
+    attr_accessor :thing, :type, :reset_thing
 
     def initialize(thing = nil)
         @thing = thing
+        @reset_thing = thing
         @type = nil
     end
 
     def evaluate()
-        if @thing.is_a?(LookUp) or @thing.is_a?(ExpressionNode)
-            @thing = @thing.evaluate
-            if @thing == true
-                @thing = CmmBoolean.new(true)
-            elsif @thing == false
-                @thing = CmmBoolean.new(false)
+        thing = @thing
+        if thing.is_a?(LookUp) or thing.is_a?(ExpressionNode)
+            thing = thing.evaluate
+            if thing == true
+                thing = CmmBoolean.new(true)
+            elsif thing == false
+                thing = CmmBoolean.new(false)
             end
         end
-        case @thing
+        case thing
         when CmmInteger
             check = "int"
         when CmmFloat
@@ -109,19 +111,19 @@ class CmmReturn < Node
         when CmmString
             check = "string"
         when FunctionCall
-            check = @thing.gettype()
+            check = thing.gettype()
         else
             begin
                 raise(SyntaxError)
             rescue SyntaxError
-                if @thing == nil
+                if thing == nil
                     abort("ERROR: #{@type}-function must '#{@type}', you dumb fuck".red())
                 else
-                    abort("ERROR: '#{@thing}' is not returnable, you dumb fuck".red())
+                    abort("ERROR: '#{thing}' is not returnable, you dumb fuck".red())
                 end
             end
         end
-        if @type == "void" and @thing != nil
+        if @type == "void" and thing != nil
             begin
                 raise(SyntaxError)
             rescue SyntaxError
@@ -129,12 +131,12 @@ class CmmReturn < Node
             end
         end
         if check == @type
-            if @thing.is_a?(FunctionCall)
-                @thing.evaluate()
+            if thing.is_a?(FunctionCall)
+                thing.evaluate()
             else
                 $scope_depth -=1
                 $scope.pop()
-                return @thing
+                return thing
             end
         else
             begin
@@ -169,6 +171,7 @@ class FunctionCall < Node
                     if c.type == nil
                         c.type = gettype()
                     end
+                    c.thing = c.reset_thing
                 end
                 if x.is_a?(ElifStatment)
                     x.returns = []
@@ -177,6 +180,7 @@ class FunctionCall < Node
                 if x.type == nil
                     x.type = gettype()
                 end
+                x.thing = x.reset_thing
             end
         end
         $funcs[@name].evaluate(@params)

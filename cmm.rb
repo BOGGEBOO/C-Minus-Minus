@@ -108,7 +108,7 @@ class CMM
             end
 
             rule :return do
-                match('return', :expr) { |_,x| CmmReturn.new(x)}
+                #match('return', :expr) { |_,x| CmmReturn.new(x)}
                 match('return', :value) { |_,x| CmmReturn.new(x)}
 
                 match('return', :if_expr) { |_,x| CmmReturn.new(x)}
@@ -347,8 +347,8 @@ class CMM
             rule :value do
                 #match(:call_function) { |x| x}
                 match(:boolean) { |x| x }
-                match(:expr) { |x| x }
-                match('[', :exprs, ']') {|_,x,_| x}
+                match(:comp) { |x| x }
+                match('[', :comp, ']') {|_,x,_| x}
                 # match(Integer)
                 # match(Float)
             end
@@ -362,12 +362,12 @@ class CMM
                 match(/[a-z]+[\w]*/)
             end
 
-            rule :exprs do
-                match(:exprs, ',', :expr) do |x,_,c|
+            rule :comps do
+                match(:comps, ',', :comp) do |x,_,c|
                     x << c
                     x
                 end
-                match(:expr) { |x| [x] }
+                match(:comp) { |x| [x] }
             end
 
             rule :comp do
