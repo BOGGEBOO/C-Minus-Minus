@@ -1,12 +1,10 @@
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
-    string a = "abcd";
-    string b = "efgh";
-    a.conga(b);
-    a.conga("ijklmnopqrstuvwxyzåäö");
-    print(a);
-
-    array<int> listA = [1,2,3,4];
-    array<int> listB = [5,6];
-    listA.conga(listB);
-    print(listA);
+    if((2 < 1 + 2) && (2**3**2 > 100))
+    {
+        print("EYO de knas mannen de funkar");
+        print(True);
+    }
+    else{
+        print(False);
+    }
 }

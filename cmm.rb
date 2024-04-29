@@ -296,8 +296,8 @@ class CMM
                 match("<") { |x| x }
                 match(">") { |x| x }
                 match("%") { |x| x }
-                match("&","&") { |a, b| "#{a}#{b}" }
-                match("|","|") { |a, b| "#{a}#{b}" }
+                match("&","&") { |a, b| "and" }
+                match("|","|") { |a, b| "or" }
             end
 
             rule :print do
@@ -370,6 +370,18 @@ class CMM
                 match(:expr) { |x| [x] }
             end
 
+            rule :comp do
+                match(:comp, '<', :expr) { |a,_,b| BinaryExpression.new(a, '<', b)}
+                match(:comp, '>', :expr) { |a,_,b| BinaryExpression.new(a, '>', b)}
+                match(:comp, '<','=', :expr) { |a,_,_,b| BinaryExpression.new(a, "<=", b)}
+                match(:comp, '>','=', :expr) { |a,_,_,b| BinaryExpression.new(a,">=", b)}
+                match(:comp, '=','=', :expr) { |a,_,_,b| BinaryExpression.new(a,"==", b)}
+                match(:comp, '!', '=', :expr){ |a,_,_,b| BinaryExpression.new(a,"!=", b)}
+                match(:comp, '&','&', :expr) { |a,_,_,b| BinaryExpression.new(a,"and", b)}
+                match(:comp, '|','|', :expr) { |a,_,_,b| BinaryExpression.new(a, "or", b)}
+                match(:expr)
+            end
+
             rule :expr do
                 match(:expr, '+', :term) { |a, _, b| AritmheticExpression.new(a, '+', b) }
                 match(:expr, '-', :term) { |a, _, b| AritmheticExpression.new(a, '-', b) }
@@ -384,9 +396,11 @@ class CMM
             end
 
             rule :expo do
-                match(:expo, '*', '*', :num) { |a, _, _, b| AritmheticExpression.new(a, '**', b) }
+                match(:num, '*', '*', :expo) { |a, _, _, b| AritmheticExpression.new(a, '**', b) }
+                match(:expo, '*', '*', :expo) { |a, _, _, b| AritmheticExpression.new(a, '**', b) }
                 match(:num)
             end
+
 
             rule :num do
                 match(:call_function) { |x| x }
@@ -398,7 +412,7 @@ class CMM
                 match(:identifier) { |a| LookUp.new(a) }
                 match("'", /\w{1}/, "'") { |_,x,_| CmmChar.new(x) }
                 match("\"", :string, "\"") { |_,x,_| CmmString.new(x) }
-                match('(', :expr, ')') { |_, a, _| a }
+                match('(', :comp, ')') { |_, a, _| a }
 
             end
 

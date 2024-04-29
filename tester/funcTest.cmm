@@ -33,8 +33,19 @@ int rec(int n){
     
 }
 
+// int fib(int n){
+//     if (n <= 1){
+//         return 1;
+//     }
+//     else{
+//         return fib(n-1) + fib(n-2);
+//     }
+// }
+
 void codeGoBrrrrrrrrrrr(){
     string fel = "DUMMA JÄVEL DU SKREB FEL";
+    // print(fib(7));
+
     if (add(1, 4) == 5){
         print("test 1: rätt");
     }

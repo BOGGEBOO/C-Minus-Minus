@@ -41,11 +41,17 @@ class AritmheticExpression < ExpressionNode
         while rhtemp.is_a?(Node)
             rhtemp = rhtemp.evaluate()
         end
-        result = eval("#{lhtemp}#{@op}#{rhtemp}")
-        if result.is_a?(Integer)
-            return CmmInteger.new(result)
-        elsif result.is_a?(Float)
-            return CmmFloat.new(result)
+        if @op == "and"
+            return (rhtemp && lhtemp)
+        elsif @op == "or"
+            return (rhtemp || lhtemp)
+        else
+            result = eval("#{lhtemp}#{@op}#{rhtemp}")
+            if result.is_a?(Integer)
+                return CmmInteger.new(result)
+            elsif result.is_a?(Float)
+                return CmmFloat.new(result)
+            end
         end
     end
 end
@@ -123,10 +129,16 @@ class BinaryExpression < ExpressionNode
         while rhtemp.is_a?(Node)
             rhtemp = rhtemp.evaluate()
         end
-        if lhtemp.is_a?(String) and rhtemp.is_a?(String)
-            return eval("'#{lhtemp}'#{@op}'#{rhtemp}'")
+        if @op == "and"
+            return (lhtemp && rhtemp)
+        elsif @op == "or"
+            return (lhtemp || rhtemp)
         else
-            return eval("#{lhtemp}#{@op}#{rhtemp}")
+            if lhtemp.is_a?(String) and rhtemp.is_a?(String)
+                return eval("'#{lhtemp}'#{@op}'#{rhtemp}'")
+            else
+                return eval("#{lhtemp}#{@op}#{rhtemp}")
+            end
         end
     end
 end
