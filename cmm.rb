@@ -94,7 +94,7 @@ class CMM
 
             rule :input do
                 match('input', '(', ')') do |_,_,_|
-                    CmmInput.new()
+                    CmmInput.new("int")
                 end
             end
 

@@ -211,7 +211,6 @@ class CmmInput < Node
 
     def evaluate()
         input = gets.chomp
-
         case @type
         when "int"
             begin
@@ -241,7 +240,6 @@ class CmmInput < Node
 
         return input
     end
-
 end
 
 class String
