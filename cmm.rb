@@ -1,6 +1,6 @@
-#!/usr/bin/env ruby
-require './rdparse'
-require './requireNodes'
+# !/usr/bin/env ruby
+require_relative './rdparse'
+require_relative './requireNodes'
 
 
 class CMM

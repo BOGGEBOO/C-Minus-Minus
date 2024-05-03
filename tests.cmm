@@ -1,6 +1,6 @@
-int add(int i){
-    return i;
-}
+// int add(int i){
+//     return i;
+// }
 
 void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     // if((2 < 1 + 2) && (2**3**2 > 100))
@@ -11,5 +11,8 @@ void codeGoBrrrrrrrrrrrrrrrrrrrrrrrrrr(){
     // else{
     //     print(False);
     // }
-    print(add(4) + add(5));
+    // print(add(4) + add(5));
+
+    print("Siffra:");
+//    int var = input();
 }
