@@ -203,10 +203,9 @@ end
 
 class CmmInput < Node
 
-    attr_accessor :type, :value
+    attr_accessor :type
 
     def initialize(type)
-        @value = ""
         @type = type
     end
 
