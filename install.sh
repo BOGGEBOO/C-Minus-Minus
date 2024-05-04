@@ -6,28 +6,33 @@ exists() {
     grep -q "^cmm(){" "$config_file"
 }
 
+mkdir cmm-source
+cp *.rb ./cmm-source/.
+rm -r ~/cmm-source
+mv ./cmm-source ~/.
+
 # Get the basename of the shell executable
 shell_basename=$(basename "$SHELL")
 
 # Check if the user is using Bash
 if [ "$shell_basename" = "bash" ]; then
-    echo "Adding alias to .bashrc..."
+    echo "Installing 'CMM'..."
     if ! exists ~/.bashrc; then
         echo "cmm(){" >> ~/.bashrc
-        echo "    ruby ~/Desktop/tdp019/cmm.rb \$1" >> ~/.bashrc
+        echo "    ruby ~/cmm-source/cmm.rb \$1" >> ~/.bashrc
         echo "}" >> ~/.bashrc
-        echo 'Alias added to "~/.bashrc". Please restart your terminal'
+        echo "'CMM' installed successfully. Please restart your terminal"
     else
         echo "'CMM' already exists on you machine. Skipping..."
     fi
 # Check if the user is using Zsh
 elif [ "$shell_basename" = "zsh" ]; then
-    echo "Adding alias to .zshrc..."
+    echo "Installing 'CMM'..."
     if ! exists ~/.zshrc; then
         echo "cmm(){" >> ~/.zshrc
-        echo "    ruby ~/Desktop/tdp019/cmm.rb \$1" >> ~/.zshrc
+        echo "    ruby ~/cmm-source/cmm.rb \$1" >> ~/.zshrc
         echo "}" >> ~/.zshrc
-        echo 'Alias added to "~/.zshrc". Please restart your terminal'
+        echo "'CMM' installed successfully. Please restart your terminal"
     else
         echo "'CMM' already exists on your machine. Skipping..."
     fi
