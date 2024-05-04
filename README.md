@@ -9,4 +9,5 @@ För att ladda ned och använda språket, följ nedanstående instruktioner
 git clone https://gitlab.liu.se/antno464/tdp019.git && cd tdp019
 ./install.sh
 ```
+#### OBS! INTE KLAR ÄNNU ^^^
 

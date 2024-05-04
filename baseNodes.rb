@@ -203,14 +203,15 @@ end
 
 class CmmInput < Node
 
-    attr_accessor :type
+    attr_accessor :type, :value
 
     def initialize(type)
+        @value = ""
         @type = type
     end
 
     def evaluate()
-        input = gets.chomp
+        input = $stdin.gets
         case @type
         when "int"
             begin
@@ -237,7 +238,6 @@ class CmmInput < Node
         else
             abort("ERROR: Input of this type is not allowed, imbicile".red())
         end
-
         return input
     end
 end
