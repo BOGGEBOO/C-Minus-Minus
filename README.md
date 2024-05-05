@@ -24,3 +24,14 @@ För att använda ```C--``` och exekvera en fil gör på då följande vis:
 cmm <file_name>.cmm
 ```
 Säkerställ att du använder filändelsen ```.cmm``` på den filen som ska köras.
+
+### Kom igång
+Nu när du har installerat ```C--``` är det dags att skriva ditt första program. ```C--``` har en entrypoint i form av en main funktion. Det är enbart koden inuti denna funktion som kommer exekveras så säkerställ att du alltid skriver din kod i den. Main funktionen ska se ut följande:
+```C
+void codeGoBrrrrrrr(){
+    // your code goes here
+}
+```
+Main funktionen är av typen ```void``` och ska därför inte returnera något.
+
+
