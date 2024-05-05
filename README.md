@@ -32,6 +32,4 @@ void codeGoBrrrrrrr(){
     // your code goes here
 }
 ```
-Main funktionen är av typen ```void``` och ska därför inte returnera något.
-
-
+Main funktionen är av typen ```void``` och ska därför inte returnera något. Namnet på funktionen är strikt bestämmt till detta, men antallet 'r' i slutet av den är arbiträrt. Det måste dock vara minst 2 stycken 'r'. Detta är för att du själv ska få välja hur entusiastisk du är över din ```C--``` kod. 
