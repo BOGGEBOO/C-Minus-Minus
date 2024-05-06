@@ -6,6 +6,7 @@ exists() {
     grep -q "^cmm(){" "$config_file"
 }
 
+echo "Installing 'CMM'..."
 mkdir cmm-source
 cp *.rb ./cmm-source/.
 rm -r ~/cmm-source
@@ -16,7 +17,6 @@ shell_basename=$(basename "$SHELL")
 
 # Check if the user is using Bash
 if [ "$shell_basename" = "bash" ]; then
-    echo "Installing 'CMM'..."
     if ! exists ~/.bashrc; then
         echo "cmm(){" >> ~/.bashrc
         echo "    ruby ~/cmm-source/cmm.rb \$1" >> ~/.bashrc
@@ -27,7 +27,6 @@ if [ "$shell_basename" = "bash" ]; then
     fi
 # Check if the user is using Zsh
 elif [ "$shell_basename" = "zsh" ]; then
-    echo "Installing 'CMM'..."
     if ! exists ~/.zshrc; then
         echo "cmm(){" >> ~/.zshrc
         echo "    ruby ~/cmm-source/cmm.rb \$1" >> ~/.zshrc
