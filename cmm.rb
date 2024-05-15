@@ -348,7 +348,7 @@ class CMM
                 #match(:call_function) { |x| x}
                 match(:boolean) { |x| x }
                 match(:comp) { |x| x }
-                match('[', :comp, ']') {|_,x,_| x}
+                match('[', :comps, ']') {|_,x,_| x}
                 # match(Integer)
                 # match(Float)
             end
