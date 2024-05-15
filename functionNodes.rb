@@ -1,4 +1,3 @@
-
 ####################################
 #   CMM FUNCTION                   #
 ####################################
@@ -55,10 +54,6 @@ class CmmFunction < Node
         ret = 0
         @codeBlock.each do |x|
             if x.is_a?(ContainerNode) and x.will_return().is_a?(CmmReturn)
-                #removing the scope created by the 'x' object since it didn't do it itself due to returning x
-                # $scope_depth -=1
-                # $scope.pop()
-                # p x.evaluate
                 return x.evaluate()
             elsif x.is_a?(CmmReturn)
                 return x.evaluate()
@@ -218,6 +213,5 @@ class MainFunction < Node
         @statements.each do |x|
             x.evaluate()
         end
-        #! se variabellista
     end
 end

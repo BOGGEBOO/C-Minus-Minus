@@ -206,7 +206,6 @@ class CmmReturn < Node
     end
 
     def evaluate(type)
-        # p @thing
         if @thing.is_a?(LookUp) or @thing.is_a?(ExpressionNode)
             @thing = @thing.evaluate
             if @thing == true
@@ -215,17 +214,13 @@ class CmmReturn < Node
                 @thing = CmmBoolean.new(false)
             end
         end
-        # p @thing
         case @thing
         when CmmInteger
             check = "int"
-            # puts "INT"
         when CmmFloat
             check = "float"
-            # puts "FLOAT"
         when CmmBoolean
             check = "bool"
-            # puts "NAAAH"
         else
             begin
                 raise(SyntaxError)
@@ -287,15 +282,12 @@ class Print < Node
     end
 
     def evaluate()
-        #loop för att gå ner genom alla noder
         temp = @val
         while temp.is_a?(Node)
             temp = temp.evaluate()
         end
-        # puts "\n\n********************************"
         puts temp
         return temp
-        # puts "********************************"
     end
 end
 
@@ -368,12 +360,9 @@ class MainFunction < Node
     end
 
     def evaluate()
-        #p @statements
         @statements.each do |x|
             x.evaluate()
         end
-        #! se variabellista
-        #p $scope
     end
 end
 
@@ -541,8 +530,6 @@ class WhileLoop < Node
                 if $scope[$scope_depth]["42069_looper"]["break"]
                     broken = true
                     break
-                # else
-                #     x.evaluate()
                 end
             end
             if broken

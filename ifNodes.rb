@@ -1,5 +1,3 @@
-# require './baseNodes'
-
 class ContainerNode < Node
     def initialize()
     end

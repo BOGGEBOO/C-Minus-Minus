@@ -194,8 +194,6 @@ class LinkedList
     end
 end
 
-
-
 class Segment
 
     attr_accessor :seg_value, :next

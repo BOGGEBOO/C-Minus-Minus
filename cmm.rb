@@ -9,16 +9,13 @@ class CMM
 
         @cmmParser = Parser.new("CMM") do
             token(/\s+/)
-            # token(/[^\s"]+/) { |x| x }
             token(/[0-9]*\.[0-9]+/) { |x| x }
-            # token(/\d+/) { |x| x.to_i }
             token(/[\w|:|ä|Ä|å|Å|ö|Ö|!]+/) { |x| x }
             token(/;/) { |x| x }
             token(/True/) { |x| x }
             token(/False/) { |x| x }
             token(/\/\/.*$/)
             token(/#.*$/)
-            # Längst ner yo
             token(/./) { |x| x }
 
 
@@ -108,9 +105,7 @@ class CMM
             end
 
             rule :return do
-                #match('return', :expr) { |_,x| CmmReturn.new(x)}
                 match('return', :value) { |_,x| CmmReturn.new(x)}
-
                 match('return', :if_expr) { |_,x| CmmReturn.new(x)}
                 match('return') { |_| CmmReturn.new()}
             end
@@ -345,12 +340,9 @@ class CMM
             end
 
             rule :value do
-                #match(:call_function) { |x| x}
                 match(:boolean) { |x| x }
                 match(:comp) { |x| x }
                 match('[', :comps, ']') {|_,x,_| x}
-                # match(Integer)
-                # match(Float)
             end
 
             rule :boolean do
